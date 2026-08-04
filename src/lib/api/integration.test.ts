@@ -1,11 +1,11 @@
 /**
- * Integration tests for the API response helpers and Zod validation
- * middleware.
+ * Integration tests for the API response helpers, Zod validation
+ * middleware, and pagination utilities.
  *
- * Exercises `apiSuccessResponse`, `apiErrorResponse`, and
- * `validateBody` in scenarios that produce HTTP status codes 400, 422,
- * and 500 — mimicking what a route handler + middleware pipeline would
- * do.
+ * Exercises `apiSuccessResponse`, `apiErrorResponse`, `validateBody`,
+ * `parsePaginationParams`, and `apiPaginatedResponse` in scenarios
+ * that produce HTTP status codes 400, 422, and 500 — mimicking what
+ * a route handler + middleware pipeline would do.
  */
 
 import { describe, expect, it } from "vitest";
@@ -17,6 +17,10 @@ import {
   type ApiSuccessResponse,
 } from "./response";
 import { validateBody, ValidationError } from "./validation";
+import {
+  apiPaginatedResponse,
+  parsePaginationParams,
+} from "./pagination";
 
 // ---------------------------------------------------------------------------
 // Helpers — route handler simulation
@@ -235,5 +239,99 @@ describe("200 OK — validated success", () => {
     expect(d.role).toBe("LISTENER");
     expect(typeof body.timestamp).toBe("string");
     expect(typeof body.requestId).toBe("string");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pagination — integration test (dummy collection route)
+// ---------------------------------------------------------------------------
+
+/**
+ * Simulate a dummy collection route handler that parses pagination
+ * query params and returns a paginated response, as a Next.js API
+ * route would.
+ */
+async function dummyCollectionRoute(rawUrl: string) {
+  const url = new URL(rawUrl);
+  const params = parsePaginationParams(url);
+  const total = 97; // fixed dummy collection size
+
+  // Simulate slicing the collection for the current page
+  const start = (params.page - 1) * params.limit;
+  const end = Math.min(start + params.limit, total);
+  const items = Array.from({ length: end - start }, (_, i) => ({
+    id: start + i,
+    title: `item-${start + i}`,
+  }));
+
+  return {
+    status: 200,
+    body: apiPaginatedResponse(items, total, params.page, params.limit),
+  };
+}
+
+describe("Pagination — integration test", () => {
+  it("parses query params and returns paginated results for page 1", async () => {
+    const res = await dummyCollectionRoute(
+      "http://localhost/api/tracks?page=1&limit=10",
+    );
+
+    expect(res.status).toBe(200);
+    const body = res.body as ReturnType<typeof apiPaginatedResponse>;
+    expect(body.success).toBe(true);
+    expect(body.data.length).toBe(10);
+    expect(body.pagination.total).toBe(97);
+    expect(body.pagination.page).toBe(1);
+    expect(body.pagination.limit).toBe(10);
+    expect(body.pagination.totalPages).toBe(10); // ceil(97/10)
+    expect(body.pagination.hasNextPage).toBe(true);
+    expect(body.pagination.hasPreviousPage).toBe(false);
+  });
+
+  it("parses query params and returns paginated results for page 2", async () => {
+    const res = await dummyCollectionRoute(
+      "http://localhost/api/tracks?page=2&limit=10",
+    );
+
+    expect(res.status).toBe(200);
+    const body = res.body as ReturnType<typeof apiPaginatedResponse>;
+    expect(body.data.length).toBe(10);
+    expect(body.pagination.page).toBe(2);
+    expect(body.pagination.hasNextPage).toBe(true);
+    expect(body.pagination.hasPreviousPage).toBe(true);
+  });
+
+  it("uses defaults when no pagination params are provided", async () => {
+    const res = await dummyCollectionRoute("http://localhost/api/tracks");
+
+    expect(res.status).toBe(200);
+    const body = res.body as ReturnType<typeof apiPaginatedResponse>;
+    expect(body.pagination.page).toBe(1);
+    expect(body.pagination.limit).toBe(20);
+    expect(body.pagination.totalPages).toBe(5); // ceil(97/20)
+  });
+
+  it("clamps limit to 100 when a large limit is requested", async () => {
+    const res = await dummyCollectionRoute(
+      "http://localhost/api/tracks?limit=500",
+    );
+
+    expect(res.status).toBe(200);
+    const body = res.body as ReturnType<typeof apiPaginatedResponse>;
+    expect(body.pagination.limit).toBe(100);
+    expect(body.pagination.totalPages).toBe(1); // ceil(97/100)
+    expect(body.pagination.hasNextPage).toBe(false);
+  });
+
+  it("returns empty data on a page beyond total pages", async () => {
+    const res = await dummyCollectionRoute(
+      "http://localhost/api/tracks?page=99",
+    );
+
+    expect(res.status).toBe(200);
+    const body = res.body as ReturnType<typeof apiPaginatedResponse>;
+    expect(body.data.length).toBe(0);
+    expect(body.pagination.hasNextPage).toBe(false);
+    expect(body.pagination.hasPreviousPage).toBe(true);
   });
 });
