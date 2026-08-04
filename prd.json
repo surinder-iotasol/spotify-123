@@ -640,7 +640,7 @@
       ],
       "priority": 9.3,
       "effort": "medium",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-010b"
       ],
