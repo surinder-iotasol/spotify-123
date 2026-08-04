@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Integration tests for the JWT authentication middleware and RBAC guards.
  *
