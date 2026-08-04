@@ -110,13 +110,77 @@
         "Unit test verifies helper utility `cn()` correctly merges Tailwind CSS classes."
       ],
       "priority": 2,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-002"
+      ],
+      "notes": "auto-split into 4 sub-stories",
+      "effort": "small",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-003a",
+      "title": "Add Tailwind CSS and PostCSS configuration",
+      "description": "Install tailwindcss/postcss and create tailwind.config.js with dark mode, HSL tokens, typography, and content paths for /src.",
+      "acceptanceCriteria": [
+        "tailwind.config.js configures dark mode, HSL color tokens, and content paths for /src",
+        "postcss.config.js registered with tailwindcss and autoprefixer"
+      ],
+      "priority": 2.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-002"
       ],
-      "notes": "",
-      "effort": "small",
-      "model": "deepseek"
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-003b",
+      "title": "Configure globals.css with dark-first HSL tokens",
+      "description": "Create src/app/globals.css with @tailwind directives and CSS custom properties for dark-first HSL palette with WCAG AA contrast.",
+      "acceptanceCriteria": [
+        "globals.css defines CSS custom properties for dark-first HSL palette",
+        "globals.css achieves WCAG AA contrast levels for text and interactive elements"
+      ],
+      "priority": 2.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-003a"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-003c",
+      "title": "Create shadcn/ui components.json configuration",
+      "description": "Create components.json to configure shadcn/ui primitive component auto-generation with correct aliases and style.",
+      "acceptanceCriteria": [
+        "components.json configured with correct component, token, and style paths",
+        "components.json sets aliases for @/ to src/ directories"
+      ],
+      "priority": 2.3,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-003b"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-003d",
+      "title": "Create cn() utility function and unit test",
+      "description": "Create lib/utils.ts with cn() helper that merges Tailwind CSS classes using clsx and tailwind-merge, plus unit test.",
+      "acceptanceCriteria": [
+        "lib/utils.ts exports cn() function merging Tailwind classes",
+        "Unit test verifies cn() correctly merges conflicting and additive classes"
+      ],
+      "priority": 2.4,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-003c"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-setup-004",
