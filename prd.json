@@ -497,13 +497,81 @@
         "Sample unit test `src/lib/sample.test.ts` and sample E2E spec `e2e/home.spec.ts` pass cleanly."
       ],
       "priority": 8,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-008"
+      ],
+      "notes": "auto-split into 4 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-009a",
+      "title": "Verify Vitest config with testing-library and Node environment",
+      "description": "Confirm vitest.config.ts supports jsdom for React components and Node.js for server tests.",
+      "acceptanceCriteria": [
+        "vitest.config.ts includes jsdom environment with @testing-library/react in setupFiles.",
+        "vitest.config.ts exclude patterns isolate e2e tests from unit suite.",
+        "npm run test executes without configuration errors."
+      ],
+      "priority": 8.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-008"
       ],
-      "notes": "",
+      "notes": "Files vitest.config.ts and vitest.setup.ts already exist in modified state."
+    },
+    {
+      "id": "STORY-setup-009b",
+      "title": "Verify Playwright config with desktop and mobile viewports",
+      "description": "Confirm playwright.config.ts targets desktop and 375px mobile viewports with webServer startup.",
+      "acceptanceCriteria": [
+        "playwright.config.ts defines desktop and mobile (375px) projects.",
+        "webServer configuration launches the dev server before E2E tests.",
+        "npm run test:e2e can resolve the Playwright binary for execution."
+      ],
+      "priority": 8.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-009a"
+      ],
+      "notes": "playwright.config.ts already exists with desktop and iPhone 12 projects."
+    },
+    {
+      "id": "STORY-setup-009c",
+      "title": "Run and verify all sample tests pass",
+      "description": "Execute unit and E2E sample tests to confirm end-to-end test infrastructure works.",
+      "acceptanceCriteria": [
+        "src/lib/sample.test.ts passes via npm run test.",
+        "e2e/home.spec.ts passes via npm run test:e2e against running dev server.",
+        "No TypeScript compilation errors from test files."
+      ],
+      "priority": 8.3,
       "effort": "medium",
-      "model": "deepseek"
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-009b"
+      ],
+      "notes": "sample.test.ts and home.spec.ts already exist with basic assertions."
+    },
+    {
+      "id": "STORY-setup-009d",
+      "title": "Commit test runner configuration and package scripts",
+      "description": "Finalize all test configuration changes and package.json scripts with a clean commit.",
+      "acceptanceCriteria": [
+        "package.json test scripts (test, test:e2e, test:watch) are correct.",
+        "All modified test config files are committed.",
+        "git status shows clean working tree after commit."
+      ],
+      "priority": 8.4,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-009c"
+      ],
+      "notes": "package.json already has correct scripts; vitest, playwright configs, and sample tests are modified."
     },
     {
       "id": "STORY-setup-010",
