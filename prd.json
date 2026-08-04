@@ -477,7 +477,7 @@
         "Integration test verifies query parameter parsing against a dummy collection route."
       ],
       "priority": 7,
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-007"
       ],
