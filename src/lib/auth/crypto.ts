@@ -47,6 +47,9 @@ export type SanitizedUser<T> = Omit<T, "passwordHash">;
  *
  * Use this in every Prisma query to prevent the hash from leaking into
  * application objects unless explicitly requested (e.g. admin audit).
+ *
+ * Also exported as `USER_SELECT_OMIT_PASSWORD` for consistency with the
+ * project's naming convention for Prisma select wrappers.
  */
 export const prismaUserSelect = {
   id: true,
@@ -70,6 +73,22 @@ export const prismaUserSelect = {
   reportsTarget: true,
   auditLogs: true,
 } as const;
+
+/**
+ * Prisma `select` object for the User model that omits `passwordHash`.
+ *
+ * Alias for `prismaUserSelect`. Prefer this name when importing the constant
+ * to match the project convention for Prisma select wrappers.
+ *
+ * ```ts
+ * const user = await prisma.user.findUnique({
+ *   where: { id },
+ *   select: USER_SELECT_OMIT_PASSWORD,
+ * });
+ * // user.passwordHash is undefined — never serialized to JSON
+ * ```
+ */
+export const USER_SELECT_OMIT_PASSWORD = prismaUserSelect;
 
 // ---------------------------------------------------------------------------
 // Helpers

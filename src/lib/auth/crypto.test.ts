@@ -10,6 +10,7 @@ import {
   comparePassword,
   sanitizeUser,
   sanitizeUserArray,
+  USER_SELECT_OMIT_PASSWORD,
 } from "./crypto";
 
 // ---------------------------------------------------------------------------
@@ -187,5 +188,61 @@ describe("sanitizeUserArray", () => {
     expect(result[1].name).toBe("B");
     expect("passwordHash" in result[0]).toBe(false);
     expect("password_hash" in result[1]).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// USER_SELECT_OMIT_PASSWORD — Prisma select wrapper
+// ---------------------------------------------------------------------------
+
+describe("USER_SELECT_OMIT_PASSWORD", () => {
+  /**
+   * All field names defined on the Prisma User model (from schema.prisma).
+   * Kept in sync manually — the test asserts they all appear in the constant.
+   */
+  const USER_FIELDS = [
+    "id",
+    "email",
+    "name",
+    "displayName",
+    "avatarUrl",
+    "roles",
+    "role",
+    "status",
+    "emailVerified",
+    "emailVerifiedAt",
+    "createdAt",
+    "updatedAt",
+    "deletedAt",
+    "artistProfile",
+    "playlists",
+    "likes",
+    "follows",
+    "reportsSent",
+    "reportsTarget",
+    "auditLogs",
+  ];
+
+  it("omits passwordHash from the select wrapper", () => {
+    expect("passwordHash" in USER_SELECT_OMIT_PASSWORD).toBe(false);
+  });
+
+  it("includes all other User model fields as true", () => {
+    for (const field of USER_FIELDS) {
+      expect(USER_SELECT_OMIT_PASSWORD).toHaveProperty(field, true);
+    }
+  });
+
+  it("does not include extra fields beyond the User model", () => {
+    const constantKeys = Object.keys(USER_SELECT_OMIT_PASSWORD);
+    for (const key of constantKeys) {
+      expect(USER_FIELDS).toContain(key);
+    }
+  });
+
+  it("is a plain object with true values (Prisma-selectable)", () => {
+    for (const value of Object.values(USER_SELECT_OMIT_PASSWORD)) {
+      expect(value).toBe(true);
+    }
   });
 });
