@@ -713,13 +713,47 @@
         "Unit tests in tests/unit/security/session.test.ts cover token creation, claim validation, signature tampering, expiration checks, and cookie header formatting."
       ],
       "priority": 11,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-007"
+      ],
+      "notes": "auto-split into 2 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-002a",
+      "title": "Fix JWT unit tests to match actual implementation",
+      "description": "Fix jwt.test.ts to expect SessionInvalidError instead of null for invalid tokens, and correct cookie name assertions to use __Host-indie_session.",
+      "acceptanceCriteria": [
+        "verifyToken rejects invalid tokens by throwing SessionInvalidError, not returning null.",
+        "createSetCookieHeader assertions check for __Host-indie_session cookie name.",
+        "createDeleteCookieHeader assertions check for __Host-indie_session cookie name."
+      ],
+      "priority": 11.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-007"
       ],
-      "notes": "",
-      "effort": "medium",
-      "model": "deepseek"
+      "notes": ""
+    },
+    {
+      "id": "STORY-security-002b",
+      "title": "Add JWT expiration and artistProfileId test coverage",
+      "description": "Add test cases for token expiration handling, artistProfileId claim serialization, and missing JWT_SECRET error.",
+      "acceptanceCriteria": [
+        "Token verification throws SessionInvalidError for expired tokens.",
+        "Token generation includes optional artistProfileId claim when provided.",
+        "Missing JWT_SECRET throws SessionInvalidError during token generation."
+      ],
+      "priority": 11.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-002a"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-security-003",
