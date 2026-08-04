@@ -12,6 +12,7 @@ import {
   verifyToken,
   createSetCookieHeader,
   createDeleteCookieHeader,
+  SessionInvalidError,
   type SessionPayload,
 } from "./jwt";
 
@@ -47,9 +48,8 @@ describe("generateToken", () => {
   it("embeds userId and role in the payload", async () => {
     const token = await generateToken(TEST_PAYLOAD);
     const decoded = await verifyToken(token);
-    expect(decoded).not.toBeNull();
-    expect(decoded!.userId).toBe("user-test-001");
-    expect(decoded!.role).toBe("ADMIN");
+    expect(decoded.userId).toBe("user-test-001");
+    expect(decoded.role).toBe("ADMIN");
   });
 });
 
@@ -61,21 +61,19 @@ describe("verifyToken", () => {
   it("returns decoded payload for a valid token", async () => {
     const token = await generateToken(TEST_PAYLOAD);
     const decoded = await verifyToken(token);
-    expect(decoded).not.toBeNull();
-    expect(decoded!.userId).toBe("user-test-001");
+    expect(decoded.userId).toBe("user-test-001");
   });
 
-  it("returns null for an invalid token", async () => {
-    const decoded = await verifyToken("invalid.token.here");
-    expect(decoded).toBeNull();
+  it("throws SessionInvalidError for an invalid token", async () => {
+    await expect(verifyToken("invalid.token.here")).rejects.toThrow(
+      SessionInvalidError,
+    );
   });
 
-  it("returns null for a tampered token", async () => {
+  it("throws SessionInvalidError for a tampered token", async () => {
     const token = await generateToken(TEST_PAYLOAD);
-    // Tamper with the payload
     const tampered = token.slice(0, -5) + "XXXXX";
-    const decoded = await verifyToken(tampered);
-    expect(decoded).toBeNull();
+    await expect(verifyToken(tampered)).rejects.toThrow(SessionInvalidError);
   });
 });
 
@@ -87,19 +85,72 @@ describe("createSetCookieHeader", () => {
   it("returns a Set-Cookie header with the token", async () => {
     const token = await generateToken(TEST_PAYLOAD);
     const header = createSetCookieHeader(token);
-    expect(header).toContain("session=");
+    expect(header).toContain("__Host-indie_session=");
     expect(header).toContain(token);
     expect(header).toContain("HttpOnly");
     expect(header).toContain("SameSite=Strict");
+    expect(header).toContain("Secure");
     expect(header).toContain("Max-Age=");
   });
 });
 
 describe("createDeleteCookieHeader", () => {
-  it("returns a Set-Cookie header that expires the cookie", async () => {
+  it("returns a Set-Cookie header that expires the cookie", () => {
     const header = createDeleteCookieHeader();
-    expect(header).toContain("session=");
+    expect(header).toContain("__Host-indie_session=");
     expect(header).toContain("Max-Age=0");
     expect(header).toContain("HttpOnly");
+    expect(header).toContain("Secure");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Additional coverage — expiration, artistProfileId, missing secret
+// ---------------------------------------------------------------------------
+
+describe("verifyToken — expired token", () => {
+  it("throws SessionInvalidError for an expired token", async () => {
+    // Build a manually-expired JWT using jose's SignJWT with exp in the past
+    const { SignJWT } = await import("jose");
+    const secret = new TextEncoder().encode(TEST_SECRET);
+    const past = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
+    const expiredToken = await new SignJWT({
+      userId: "user-test-001",
+      role: "ADMIN",
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt(past)
+      .setExpirationTime(past) // already expired
+      .sign(secret);
+    await expect(verifyToken(expiredToken)).rejects.toThrow(SessionInvalidError);
+  });
+});
+
+describe("generateToken — artistProfileId", () => {
+  it("includes artistProfileId in the decoded payload", async () => {
+    const payload: SessionPayload = {
+      userId: "user-test-002",
+      role: "ARTIST",
+      artistProfileId: "artist-profile-abc",
+    };
+    const token = await generateToken(payload);
+    const decoded = await verifyToken(token);
+    expect(decoded.userId).toBe("user-test-002");
+    expect(decoded.role).toBe("ARTIST");
+    expect(decoded.artistProfileId).toBe("artist-profile-abc");
+  });
+});
+
+describe("generateToken — missing JWT_SECRET", () => {
+  it("throws SessionInvalidError when JWT_SECRET is not set", async () => {
+    const original = process.env.JWT_SECRET;
+    delete process.env.JWT_SECRET;
+    try {
+      await expect(generateToken(TEST_PAYLOAD)).rejects.toThrow(
+        SessionInvalidError,
+      );
+    } finally {
+      process.env.JWT_SECRET = original ?? "";
+    }
   });
 });
