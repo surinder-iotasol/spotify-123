@@ -168,3 +168,52 @@ export function stripSensitiveFields<T extends Record<string, unknown>>(
   }
   return result as SanitizedUser<T>;
 }
+
+/**
+ * Field names that specifically hold password credential data.
+ *
+ * Used by `sanitizeUser` to produce a shallow copy safe for JSON serialization
+ * and API response bodies — the password hash is never exposed to clients.
+ */
+const PASSWORD_CREDENTIAL_FIELDS = [
+  "passwordhash",
+  "password_hash",
+];
+
+/**
+ * Sanitise a single user object by stripping password credential fields.
+ *
+ * Returns a **new** object with `passwordHash` and `password_hash` removed so
+ * the original (which may contain the actual hash) is never mutated or leaked.
+ *
+ * @param user - The user object to sanitise.
+ * @returns A new object without password credential fields.
+ */
+export function sanitizeUser<T extends Record<string, unknown>>(
+  user: T,
+): Omit<T, "passwordHash" | "password_hash"> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(user)) {
+    if (PASSWORD_CREDENTIAL_FIELDS.includes(key.toLowerCase())) continue;
+    result[key] = value;
+  }
+  return result as Omit<T, "passwordHash" | "password_hash">;
+}
+
+/**
+ * Sanitise an array of user objects.
+ *
+ * Applies `sanitizeUser` to each element and returns a **new** array — the
+ * original array and its elements are never mutated.
+ *
+ * @param users - The array of user objects to sanitise.
+ * @returns A new array of sanitized user objects.
+ */
+export function sanitizeUserArray<T extends Record<string, unknown>>(
+  users: T[],
+): Omit<T, "passwordHash" | "password_hash">[] {
+  return users.map((user) => sanitizeUser(user)) as Omit<
+    T,
+    "passwordHash" | "password_hash"
+  >[];
+}
