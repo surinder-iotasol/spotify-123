@@ -1,0 +1,24 @@
+{
+  "manifestVersion": 1,
+  "projectType": "fullstack",
+  "frameworks": [],
+  "techStack": [
+    "typescript",
+    "none",
+    "nextjs",
+    "mongodb",
+    "prisma",
+    "rest"
+  ],
+  "services": [
+    {
+      "name": "frontend",
+      "kind": "frontend",
+      "cwd": "",
+      "startCommand": "npm run dev",
+      "portEnv": "PORT",
+      "healthPath": "/"
+    }
+  ],
+  "endpoints": []
+}

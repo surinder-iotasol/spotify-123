@@ -1,0 +1,2473 @@
+{
+  "branchName": "iotahub/phase-1",
+  "userStories": [
+    {
+      "id": "STORY-setup-001",
+      "title": "Initialize repository workspace git config and project root files",
+      "description": "Create the root repository workspace structure including git initialization, comprehensive .gitignore for Node and Next.js, README.md, .editorconfig, and root package.json. Defines the foundational workspace environment for subsequent scaffolding stories.",
+      "acceptanceCriteria": [
+        "Repository root contains initialized `.git` directory and clean working tree.",
+        "`.gitignore` exists covering `node_modules`, `.next`, `.env`, and build artifacts.",
+        "`.editorconfig` specifies 2-space indentation, UTF-8 encoding, and LF line endings.",
+        "`README.md` documents repository layout, setup prerequisites, and development scripts.",
+        "Root `package.json` initializes project name as `spotify` with private package status."
+      ],
+      "priority": 0,
+      "passes": false,
+      "dependsOn": [],
+      "notes": "",
+      "effort": "low",
+      "model": "haiku"
+    },
+    {
+      "id": "STORY-setup-002",
+      "title": "Scaffold Next.js 14 fullstack monolith project baseline",
+      "description": "Scaffold a Next.js 14 App Router project with TypeScript 5.x support in the root directory. Configures strict TypeScript compiler options, App Router directory layout (`/app`), and basic page/layout entrypoints.",
+      "acceptanceCriteria": [
+        "Next.js 14 App Router project initialized with TypeScript 5.x configuration in root directory.",
+        "`tsconfig.json` enforces `strict: true`, `target: ES2022`, and path aliases `@/*` pointing to `./src/*`.",
+        "`app/layout.tsx` and `app/page.tsx` exist as minimal functional React Server Components.",
+        "Running `npm run build` completes with exit code 0 and produces optimized standalone build output.",
+        "Running `npm run dev` boots Next.js development server on `http://localhost:3000` without runtime errors."
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-001"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "haiku"
+    },
+    {
+      "id": "STORY-setup-003",
+      "title": "Install core dependencies and configure Tailwind CSS with shadcn UI",
+      "description": "Install Tailwind CSS 3.4+, Radix UI primitives, shadcn/ui integration, lucide-react icons, and music-metadata. Sets up dark-mode first HSL design tokens, responsive grid defaults down to 375px viewports, and utility styling classes.",
+      "acceptanceCriteria": [
+        "Dependencies `@radix-ui/react-slot`, `clsx`, `tailwind-merge`, `lucide-react`, `music-metadata` installed in `package.json`.",
+        "`tailwind.config.js` configures dark mode, HSL color tokens, typography scales, and content paths for `/src`.",
+        "`src/app/globals.css` defines CSS custom properties for dark-first HSL palette and WCAG AA contrast levels.",
+        "`components.json` configured for shadcn/ui primitive component auto-generation.",
+        "Unit test verifies helper utility `cn()` correctly merges Tailwind CSS classes."
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-002"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-004",
+      "title": "Implement MongoDB database schema and Prisma ORM models",
+      "description": "Configure Prisma ORM v5.x with MongoDB provider. Implement all 8 core canonical models (User, ArtistProfile, Track, Playlist, PlaylistTrack, Like, Follow, Report, AuditLog) and required enums, compound unique indexes, and relational attributes.",
+      "acceptanceCriteria": [
+        "`prisma/schema.prisma` created with MongoDB provider and 8 canonical models matching exact field specifications.",
+        "Enums `UserRole`, `AccountStatus`, `TrackStatus`, `Genre`, `ReportReason`, `ReportStatus`, and `AuditAction` defined.",
+        "Compound unique indexes `@unique([playlistId, position])`, `@unique([playlistId, trackId])`, `@unique([userId, trackId])`, `@unique([followerId, artistProfileId])` configured.",
+        "`npx prisma validate` succeeds and `npx prisma generate` outputs type-safe PrismaClient SDK.",
+        "Unit test instantiates PrismaClient and validates all model typings compile without TypeScript errors."
+      ],
+      "priority": 3,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-005",
+      "title": "Implement StorageService interface abstraction for S3 signed URLs",
+      "description": "Implement the vendor-agnostic `StorageService` interface wrapping `@aws-sdk/client-s3`. Provides methods for file upload, object deletion, and generating 60-minute presigned PUT upload URLs and 15-minute presigned GET stream delivery URLs.",
+      "acceptanceCriteria": [
+        "`StorageService` interface implemented in `src/lib/storage/storage.service.ts` with `uploadObject`, `deleteObject`, `generateSignedUrl`.",
+        "`S3StorageService` implementation handles AWS S3 / Cloudflare R2 compatible endpoint configurations.",
+        "`generateSignedUrl` enforces 3600-second TTL cap for `getObject` streaming requests.",
+        "Unit tests mock S3 client and verify correct presigned URL generation and parameter passing for `putObject` and `getObject`.",
+        "Integration test validates audio upload size constraint validation helper caps files at 50MB."
+      ],
+      "priority": 4,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-006",
+      "title": "Implement standardized REST API response wrappers and validation middleware",
+      "description": "Implement standard API JSON success and error outer envelopes, request ID tracing, UTC ISO-8601 timestamping, and a Zod schema validation middleware returning 422 Unprocessable Entity details arrays.",
+      "acceptanceCriteria": [
+        "Success helper `apiSuccessResponse(data, meta)` constructs payload with `success: true`, `data`, UTC timestamp, and `requestId`.",
+        "Error helper `apiErrorResponse(code, message, details)` constructs payload with `success: false`, `error` code, and optional `details` array.",
+        "Validation middleware `validateBody(schema)` validates Zod schema and returns HTTP 422 with `ValidationErrorDetail` format on failure.",
+        "Passwords and sensitive credentials are sanitized and excluded from error payload outputs and log traces.",
+        "Integration tests cover `apiSuccessResponse`, `apiErrorResponse`, and Zod validation failure scenarios for HTTP status codes 400, 422, and 500."
+      ],
+      "priority": 5,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-005"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-007",
+      "title": "Implement JWT authentication middleware and admin RBAC route guards",
+      "description": "Build server-side authentication middleware handling 7-day HTTP-only cookies containing JWT session tokens. Implement bcrypt cost-12 password hashing helpers and strict server-side RBAC middleware for `/api/v1/admin/*` and `/admin/*` routes.",
+      "acceptanceCriteria": [
+        "`hashPassword` and `comparePassword` utilities wrap `bcryptjs` using cost factor 12.",
+        "`generateToken` and `verifyToken` helpers handle 7-day JWT stateless session payloads.",
+        "Next.js `middleware.ts` intercepts `/admin/*` and `/api/v1/admin/*` routes, enforcing `ADMIN` user role server-side.",
+        "Unauthenticated requests to protected paths return HTTP 401 `UNAUTHENTICATED`, non-admin requests return HTTP 403 `FORBIDDEN_INSUFFICIENT_ROLE`.",
+        "Integration tests verify JWT session extraction from HTTP-only cookies and RBAC route protection for Listener vs Admin roles."
+      ],
+      "priority": 6,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-008",
+      "title": "Implement limit-offset pagination contracts and response helpers",
+      "description": "Create standard pagination parser and formatter utilities for REST collection endpoints. Enforces 1-indexed page numbers, default 20-item limits, 100-item maximum caps, and paginated API response JSON structures.",
+      "acceptanceCriteria": [
+        "`parsePaginationParams(url)` parses `page` (default 1) and `limit` (default 20, max 100).",
+        "`apiPaginatedResponse(data, total, page, limit)` returns JSON envelope containing `data[]`, `pagination` object (`total`, `page`, `limit`, `totalPages`, `hasNextPage`, `hasPreviousPage`), and `meta`.",
+        "`limit` values exceeding 100 are automatically clamped to 100.",
+        "Unit tests in `src/lib/api/pagination.test.ts` test default fallback, maximum clamping, and total page calculation math.",
+        "Integration test verifies query parameter parsing against a dummy collection route."
+      ],
+      "priority": 7,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-007"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-009",
+      "title": "Configure Vitest unit integration test runner and Playwright E2E setup",
+      "description": "Configure Vitest for server/service unit testing and Playwright for frontend E2E browser testing. Includes test scripts in `package.json`, environment setup, and baseline passing test suites.",
+      "acceptanceCriteria": [
+        "Vitest configured with `@testing-library/react` and Node.js environment in `vitest.config.ts`.",
+        "Playwright configured in `playwright.config.ts` targeting standard web viewports (desktop and 375px mobile).",
+        "`npm run test` executes Vitest unit/integration tests with exit code 0.",
+        "`npm run test:e2e` executes Playwright specs against running dev server with exit code 0.",
+        "Sample unit test `src/lib/sample.test.ts` and sample E2E spec `e2e/home.spec.ts` pass cleanly."
+      ],
+      "priority": 8,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-008"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-010",
+      "title": "Configure environment variable schema template and GitHub Actions CI workflow",
+      "description": "Create `.env.example` defining all required runtime secrets and setup a GitHub Actions CI pipeline running linting, TypeScript compilation, Prisma schema validation, Vitest unit tests, and Playwright E2E suites.",
+      "acceptanceCriteria": [
+        "`.env.example` created listing `DATABASE_URL`, `JWT_SECRET`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_ENDPOINT`.",
+        "`src/lib/env.ts` implements Zod parsing for process.env at server startup.",
+        "`.github/workflows/ci.yml` created with steps: checkout, node setup, install dependencies, lint, typecheck, prisma validate, vitest run, playwright test.",
+        "Build fails in CI if TypeScript compilation contains errors or test coverage target is breached.",
+        "Manual execution of CI workflow steps locally succeeds cleanly."
+      ],
+      "priority": 9,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-009"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-001",
+      "title": "Implement Bcrypt Password Hashing and Payload Sanitization Utility",
+      "description": "Create a backend security service using bcrypt with cost factor 12 and 16-byte random salt to hash user passwords prior to storage in MongoDB. Include automatic sanitization functions to strip passwordHash from Prisma database queries and API response payloads.",
+      "acceptanceCriteria": [
+        "Hashing passwords using bcrypt generates a valid salt and hash using cost factor 12.",
+        "Verifying a raw password against the stored hash returns true for correct input and false for invalid input.",
+        "Sanitization helper function strips passwordHash from User model objects before JSON serialization.",
+        "Prisma query select wrappers omit passwordHash from returned fields unless explicitly selected.",
+        "Password hashes are never written to standard log streams or error stack trace outputs per sec-024 sensitive data security rules.",
+        "Unit tests in tests/unit/security/password.test.ts verify hashing, cost factor 12 execution time (~250ms), verification logic, and payload sanitization."
+      ],
+      "priority": 10,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-002",
+      "title": "Implement Session JWT Token Service and Secure Cookie Serialization",
+      "description": "Develop a stateless JWT session token management service that signs and verifies claims including userId, role, and optional artistProfileId using HMAC-SHA256. Configure HTTP-only, SameSite=Strict, Secure cookie serialization with a 7-day expiration under __Host-indie_session.",
+      "acceptanceCriteria": [
+        "JWT token generation includes userId, role ('LISTENER'|'ARTIST'|'ADMIN'), optional artistProfileId, iat, and exp claims signed with JWT_SECRET.",
+        "Session cookie serialization sets __Host-indie_session with HttpOnly: true, Secure: true, SameSite: Strict, Path: /, and Max-Age: 604800 (7 days).",
+        "Expired or tampered JWT signatures fail verification and throw a structured session invalidation error.",
+        "All timestamp claims (iat, exp) adhere to UTC ISO-8601 / Unix epoch standards in UTC per constraint 0.",
+        "Unit tests in tests/unit/security/session.test.ts cover token creation, claim validation, signature tampering, expiration checks, and cookie header formatting."
+      ],
+      "priority": 11,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-007"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-003",
+      "title": "Implement Next.js Edge Middleware for Server-Side Route Guarding",
+      "description": "Build Next.js Edge Middleware in middleware.ts to intercept protected routes /admin/*, /api/v1/admin/*, /api/v1/artist/*, /api/v1/playlists/*, and /api/v1/reports/*. Verify session cookies, validate role hierarchy, and inject decoded identity claims into request headers.",
+      "acceptanceCriteria": [
+        "Unauthenticated requests targeting protected routes return HTTP status 401 Unauthorized.",
+        "Authenticated requests lacking required roles (e.g. Listener accessing /admin/*) return HTTP status 403 Forbidden per constraint 3.",
+        "Valid requests propagate decoded session claims in custom request headers x-user-id, x-user-role, and x-artist-profile-id to downstream handlers.",
+        "Public routes (such as guest search and track streaming) bypass middleware role checks per DEC-005.",
+        "Unit tests cover middleware claim parsing and route matcher logic.",
+        "Integration tests verify HTTP 401, 403, and header injection behavior for protected API routes."
+      ],
+      "priority": 12,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-007",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004",
+      "title": "Implement Resource Ownership Verification Helpers and IDOR Protection",
+      "description": "Implement reusable backend resource authorization functions to enforce Insecure Direct Object Reference (IDOR) protection in REST API route handlers. Ensure users can only modify or delete their own Track and Playlist records unless they hold the Admin role.",
+      "acceptanceCriteria": [
+        "Track ownership check confirms Track.artistProfileId equals caller's artistProfileId or caller holds ADMIN role.",
+        "Playlist ownership check confirms Playlist.userId equals caller's userId or caller holds ADMIN role.",
+        "Failed ownership checks abort execution and return HTTP 403 Forbidden with code ERR_RESOURCE_OWNERSHIP_DENIED and detailed resource info.",
+        "Admin role overrides ownership restrictions across all Track and Playlist update and delete handlers.",
+        "Integration tests assert HTTP 403 response structure when an unauthorized user attempts to edit another user's playlist or track."
+      ],
+      "priority": 13,
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-001",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-005",
+      "title": "Implement Higher-Order withAuth and withRole API Handler Wrappers",
+      "description": "Create higher-order functions withAuth and withRole to wrap Next.js API handlers, extract session claims, build an immutable AuthContext, and handle authentication error responses uniformly.",
+      "acceptanceCriteria": [
+        "withAuth extracts claims from request headers injected by middleware or direct cookie verification and constructs immutable AuthContext.",
+        "withRole verifies that AuthContext.user.role matches one of the specified allowed roles for the route.",
+        "Token invalidation or expiry caught inside the wrapper returns HTTP 401 Unauthorized with standardized envelope error code ERR_UNAUTHORIZED.",
+        "Unit tests in tests/unit/security/wrappers.test.ts verify AuthContext injection and role boundary validation.",
+        "Integration tests confirm 401 error envelope format when calling wrapped endpoints without valid session headers."
+      ],
+      "priority": 14,
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-002",
+        "STORY-setup-006"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-001",
+      "title": "Implement Unified StorageProvider Interface for S3 and Cloudflare R2",
+      "description": "Build the StorageProvider abstraction layer utilizing AWS SDK v3 to support Amazon S3 and Cloudflare R2 object storage backends. Dynamically select provider implementation based on the STORAGE_PROVIDER environment variable.",
+      "acceptanceCriteria": [
+        "StorageProvider interface exposes generatePresignedUploadUrl, generatePresignedDownloadUrl, deleteObject, and getObjectMetadata.",
+        "System initializes AWS S3 or Cloudflare R2 client according to STORAGE_PROVIDER ('s3' or 'r2') environment configuration per DEC-008.",
+        "Presigned upload URLs generate valid S3/R2 PUT targets with specified TTL.",
+        "Presigned download URLs generate access-controlled GET targets with specified TTL.",
+        "Unit tests mock AWS SDK calls to test presigned URL creation, metadata reading, and object deletion.",
+        "Integration tests against mock S3 storage verify presigned upload token generation and metadata retrieval."
+      ],
+      "priority": 15,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-005"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-002",
+      "title": "Implement Upload Intent API Endpoint with Media Validation",
+      "description": "Create backend endpoint POST /api/v1/storage/upload-intent to validate file metadata against audio and image size/MIME rules before returning direct-to-storage presigned upload URLs.",
+      "acceptanceCriteria": [
+        "Endpoint accepts fileType ('audio'|'image'), fileName, fileSizeBytes, and mimeType.",
+        "Audio uploads are restricted to MP3 (audio/mpeg) and WAV (audio/wav) up to 50MB (52,428,800 bytes) per constraint 1.",
+        "Cover image uploads are restricted to JPEG, PNG, and WebP up to 10MB (10,485,760 bytes).",
+        "Invalid file formats or sizes exceeding limits return HTTP 422 Unprocessable Entity with details before presigning.",
+        "Valid requests return HTTP 200 OK with a 60-minute presigned PUT URL and deterministic object key (audio/{artistId}/{trackId}_{uuid}.{ext} or images/{artistId}/{imageId}_{uuid}.webp).",
+        "Integration test verifies POST /api/v1/storage/upload-intent with valid and invalid audio payloads."
+      ],
+      "priority": 16,
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-001",
+        "STORY-security-005"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-003",
+      "title": "Implement Presigned Playback Stream URL Endpoint and Byte Range Headers",
+      "description": "Create backend endpoint GET /api/v1/tracks/:id/stream to issue short-lived GET presigned playback URLs (15-minute TTL) with HTTP byte-range request header support for low-latency streaming.",
+      "acceptanceCriteria": [
+        "Request generates a presigned GET URL with a 900-second (15-minute) expiration for track playback per DEC-008.",
+        "Allows unauthenticated guest access for public track streaming per DEC-005.",
+        "Emits HTTP response headers Accept-Ranges: bytes and Cache-Control: private, max-age=900.",
+        "Supports HTTP 206 Partial Content range responses with Content-Range: bytes <start>-<end>/<total> to meet SLA of under 2 seconds audio playback start per sec-024.",
+        "Unit tests verify stream URL generation and expiry configuration.",
+        "Integration test calls GET /api/v1/tracks/:id/stream and verifies response headers and presigned stream URL payload."
+      ],
+      "priority": 17,
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-001",
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-004",
+      "title": "Implement Frontend Direct-to-Storage Upload Hook and Upload Component",
+      "description": "Build React hook useDirectUpload and UI component FileUploadProgress to request presigned upload URLs from the storage API and execute client-side direct binary uploads to S3/R2 with progress indicators.",
+      "acceptanceCriteria": [
+        "useDirectUpload hook manages request flow: POST /upload-intent, direct S3/R2 PUT binary transfer, progress state, and completion.",
+        "UI displays real-time progress bar, transfer percentage, and error notifications adhering to design tokens.",
+        "Pre-upload client validation checks file size (max 50MB audio) and MIME format before network requests.",
+        "Upload controls and progress indicators satisfy WCAG 2.1 AA accessibility keyboard and screen reader standards per constraint 5.",
+        "Responsive layout scales down gracefully to 375px mobile viewports per sec-026.",
+        "Unit tests in tests/unit/components/upload.test.tsx test hook states and upload validation.",
+        "Playwright E2E spec in e2e/tests/upload-flow.spec.ts verifies selecting an audio file, observing progress, and completing direct upload."
+      ],
+      "priority": 18,
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-002",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-001",
+      "title": "Implement User Registration API Endpoint and Payload Validation",
+      "description": "Build POST /api/v1/auth/register API endpoint to validate registration payloads, enforce email normalization and uniqueness, create User records with bcrypt password hashes, and return a 7-day session cookie.",
+      "acceptanceCriteria": [
+        "Accepts { email, password, displayName }, normalizes email to lowercase, and validates password strength (min 8 chars, 1 uppercase, 1 lowercase, 1 digit).",
+        "Returns HTTP 409 Conflict with code AUTH_EMAIL_EXISTS if email is already registered.",
+        "Hashes password using bcrypt cost 12 and creates User record with role LISTENER per DEC-004.",
+        "Sets __Host-indie_session HTTP-only, SameSite=Strict cookie with 7-day TTL and returns HTTP 201 Created with sanitized user object.",
+        "Timestamps (createdAt) are stored and returned in UTC ISO-8601 format per constraint 0.",
+        "Passwords are sanitized out of response payloads and never logged per constraint 4 and sec-024 rules.",
+        "Integration test asserts POST /api/v1/auth/register creates user, sets session cookie, and returns sanitized envelope."
+      ],
+      "priority": 19,
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-001",
+        "STORY-security-002",
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-002",
+      "title": "Implement User Login API Endpoint with Rate Limiting",
+      "description": "Build POST /api/v1/auth/login endpoint to authenticate registered users via email and password, issue session cookies, and enforce a 5-attempt per 15-minute rate limit policy per IP address.",
+      "acceptanceCriteria": [
+        "Validates email and password, returning HTTP 200 OK and setting the 7-day __Host-indie_session cookie upon successful match.",
+        "Returns HTTP 401 Unauthorized with code INVALID_CREDENTIALS for non-existent emails or incorrect passwords.",
+        "Enforces rate limiting: exceeding 5 failed login attempts in 15 minutes per IP triggers HTTP 429 Too Many Requests with code RATE_LIMIT_EXCEEDED per sec-025.",
+        "Password inputs and failure attempts do not output plaintext credentials to application loggers per constraint 4.",
+        "Integration test verifies successful login cookie issuance, 401 error envelope on invalid credentials, and 429 rate limit triggering after 5 failed attempts."
+      ],
+      "priority": 20,
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-001",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-003",
+      "title": "Implement Password Reset and Credential Management APIs",
+      "description": "Implement backend endpoints POST /api/v1/auth/forgot-password, POST /api/v1/auth/reset-password, and PATCH /api/v1/auth/password for self-service password recovery and authenticated credential updates.",
+      "acceptanceCriteria": [
+        "POST /api/v1/auth/forgot-password generates a 60-minute reset token stored as a hash in DB and returns a uniform HTTP 200 OK response to prevent email enumeration.",
+        "POST /api/v1/auth/reset-password validates reset token, updates bcrypt password hash, invalidates used token, and revokes active session cookies.",
+        "PATCH /api/v1/auth/password verifies caller's currentPassword, updates to newPassword, and regenerates the session token.",
+        "Password reset tokens and updated hashes use UTC ISO-8601 expiration timestamps per constraint 0.",
+        "Integration tests cover forgot password uniform response, reset password execution, token expiry rejection, and credential update logic."
+      ],
+      "priority": 21,
+      "passes": false,
+      "dependsOn": [
+        "STORY-auth-001",
+        "STORY-security-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-004",
+      "title": "Implement Log Sanitization and Password Field Protection Middleware",
+      "description": "Build global logging middleware to intercept incoming request bodies on auth routes and sanitize sensitive credential fields (password, oldPassword, newPassword) before passing logs to central monitoring.",
+      "acceptanceCriteria": [
+        "Middleware inspects incoming payload bodies on /api/v1/auth/* routes and replaces sensitive keys with [REDACTED].",
+        "Structured application error logs strip password fields from stack traces and error details.",
+        "Data in transit is enforced over TLS 1.3 encrypted connections per sec-025.",
+        "Unit tests in tests/unit/middleware/sanitizer.test.ts verify payload redaction across various nested JSON structures."
+      ],
+      "priority": 22,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006",
+        "STORY-security-001"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-005",
+      "title": "Implement Guest Session Migration Service",
+      "description": "Create client and backend helper functions to migrate temporary in-memory/localStorage guest playlist drafts and queue state into permanent Playlist records upon user registration or sign-in.",
+      "acceptanceCriteria": [
+        "Guest session state reader extracts local draft playlist tracks from client storage post-registration.",
+        "Client issues POST /api/v1/playlists with guest playlist data to create permanent database records linked to the new User.id.",
+        "Active audio streaming player state is preserved continuously across registration without resetting playback per DEC-005.",
+        "Unit tests verify guest state extraction and payload formatting.",
+        "Integration test validates converting a guest playlist payload into a persisted Playlist entity."
+      ],
+      "priority": 23,
+      "passes": false,
+      "dependsOn": [
+        "STORY-auth-001",
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-006",
+      "title": "Implement Frontend Account Registration Page and Interactive Form",
+      "description": "Build Next.js user registration page /register featuring Zod schema client-side validation, password strength meter, show/hide password toggle, accessible loading states, and responsive shadcn layout.",
+      "acceptanceCriteria": [
+        "Renders /register page using dark-mode design system tokens, responsive grid layouts down to 375px mobile viewports per sec-026.",
+        "Input fields for email, password, and displayName validate on blur and submit using Zod schema rules.",
+        "Password input features an interactive visibility toggle button (masked vs unmasked) and real-time password strength meter.",
+        "API submission displays active loading spinner on submit button, disables re-clicks with aria-disabled=\"true\".",
+        "Server errors (such as AUTH_EMAIL_EXISTS) render in an accessible alert banner at the top of the form with focus moved to the first invalid field per WCAG 2.1 AA (constraint 5).",
+        "Unit tests verify form validation rules and component state transitions.",
+        "Playwright E2E spec e2e/tests/register.spec.ts covers successful registration, duplicate email handling, and validation error display."
+      ],
+      "priority": 24,
+      "passes": false,
+      "dependsOn": [
+        "STORY-auth-001",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-007",
+      "title": "Implement Frontend Login Page and Form Component",
+      "description": "Build Next.js user login page /login with Zod validation, error callout banners, password visibility toggle, guest session migration trigger, and seamless redirect after authentication.",
+      "acceptanceCriteria": [
+        "Renders /login page using design tokens and responsive layout down to 375px mobile viewport per sec-026.",
+        "Form validates email and password inputs, displaying inline feedback on invalid submission.",
+        "Successful login triggers guest session state migration if guest playlist items exist in local storage per DEC-005.",
+        "Password field includes show/hide visibility toggle and accessible label associations complying with WCAG 2.1 AA per constraint 5.",
+        "Server authentication errors (such as INVALID_CREDENTIALS or RATE_LIMIT_EXCEEDED) display in an accessible alert callout banner.",
+        "Unit tests verify login form states and submit event handling.",
+        "Playwright E2E spec e2e/tests/login.spec.ts tests valid login flow, invalid credentials error, and guest migration trigger."
+      ],
+      "priority": 25,
+      "passes": false,
+      "dependsOn": [
+        "STORY-auth-002",
+        "STORY-auth-005",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-auth-008",
+      "title": "Implement Frontend Password Recovery Pages",
+      "description": "Build Next.js UI pages /forgot-password and /reset-password allowing users to request password reset links and submit new credentials with real-time feedback and accessibility.",
+      "acceptanceCriteria": [
+        "/forgot-password page accepts email and presents a confirmation message regardless of email existence to prevent account enumeration.",
+        "/reset-password page extracts reset token from URL query params and validates new password against strength rules before submitting.",
+        "Visual feedback banners notify user of successful password reset and provide a link to sign in.",
+        "Form controls adhere to WCAG 2.1 AA keyboard navigation and screen reader standards per constraint 5.",
+        "Unit tests verify form schema validation and token state handling.",
+        "Playwright E2E spec e2e/tests/password-reset.spec.ts verifies full password recovery user flow from forgot-password submission to reset-password update."
+      ],
+      "priority": 26,
+      "passes": false,
+      "dependsOn": [
+        "STORY-auth-003",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-role-001",
+      "title": "Implement Listener to Artist Role Upgrade API Endpoint",
+      "description": "Create the POST /api/v1/users/me/upgrade-to-artist API endpoint allowing registered Listener users to upgrade to an Artist role. Executes an atomic transaction to append the ARTIST role flag to User.roles, provision a linked ArtistProfile model, and return an updated JWT session payload. Preserves existing user favorites, playlists, and follow relationships without requiring re-registration.",
+      "acceptanceCriteria": [
+        "POST /api/v1/users/me/upgrade-to-artist appends 'ARTIST' to User.roles while preserving 'LISTENER' privileges.",
+        "Provisions an ArtistProfile record with userId, stageName (defaulting to User.name if omitted), bio, genreTags, and initial followerCount=0, trackCount=0.",
+        "Returns HTTP 200 OK with the updated User object, new ArtistProfile, and a fresh JWT containing revised role claims.",
+        "Timestamps in the response payload are formatted in UTC ISO-8601 per constraint [0].",
+        "Unit tests in src/services/role.test.ts verify atomic role update and default stageName fallback logic.",
+        "Integration test calls POST /api/v1/users/me/upgrade-to-artist with valid payload and asserts HTTP 200 plus correct database state."
+      ],
+      "priority": 27,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-role-002",
+      "title": "Implement Verification Email Generation and Dispatch Service",
+      "description": "Build the backend service and API endpoint POST /api/v1/auth/verify-email/request to generate cryptographically secure email verification tokens. Generates a 64-character hex token via crypto.randomBytes(32), stores a SHA-256 digest in the database with a 24-hour expiration window, invalidates previous active tokens, and dispatches a single-use verification link via email.",
+      "acceptanceCriteria": [
+        "POST /api/v1/auth/verify-email/request generates a 64-character random token and persists its SHA-256 digest with expiresAt set 24 hours in the future.",
+        "Invalidates any existing active verification token records for the requesting user prior to creating a new token.",
+        "Returns HTTP 202 Accepted with a confirmation message and expiresInSeconds=86400.",
+        "Applies rate limiting on POST /api/v1/auth/verify-email/request per cross-cutting security policy sec-025.",
+        "Unit tests in src/services/emailVerification.test.ts cover token generation, SHA-256 hashing, and prior token invalidation.",
+        "Integration test calls POST /api/v1/auth/verify-email/request for an authenticated user and asserts HTTP 202 status and DB record."
+      ],
+      "priority": 28,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-role-003",
+      "title": "Implement Email Verification Token Confirmation and Status APIs",
+      "description": "Implement POST /api/v1/auth/verify-email/confirm to validate incoming raw tokens against SHA-256 database digests and GET /api/v1/users/me/verification-status to retrieve email verification status. Validates token freshness (expiresAt > current_time), sets User.emailVerified to true with a UTC ISO-8601 timestamp, deletes used token records, and returns explicit status data.",
+      "acceptanceCriteria": [
+        "POST /api/v1/auth/verify-email/confirm hashes incoming raw token with SHA-256 and matches against active database records.",
+        "If token is valid and unexpired, updates User.emailVerified to true, sets emailVerifiedAt to UTC ISO-8601 timestamp, and deletes the token record.",
+        "If token is invalid or expired, returns HTTP 400 Bad Request with error code INVALID_VERIFICATION_TOKEN.",
+        "GET /api/v1/users/me/verification-status returns HTTP 200 OK with emailVerified, canUpload boolean, and roles array.",
+        "Unit tests in src/services/emailVerificationConfirm.test.ts cover valid token processing, expired token rejection, and invalid digest matching.",
+        "Integration test calls POST /api/v1/auth/verify-email/confirm with valid and invalid tokens and verifies exact HTTP responses."
+      ],
+      "priority": 29,
+      "passes": false,
+      "dependsOn": [
+        "STORY-role-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-role-004",
+      "title": "Implement Email Verification Gating Middleware for Track Uploads",
+      "description": "Implement the requireVerifiedEmail middleware enforcing DEC-004, which restricts track upload execution exclusively to users with verified email addresses. Intercepts request flows targeting POST /api/v1/tracks and POST /api/v1/tracks/upload-intent, rejecting unverified users with HTTP 403 Forbidden without affecting streaming, search, or playlist actions.",
+      "acceptanceCriteria": [
+        "requireVerifiedEmail middleware checks User.emailVerified property on authenticated request contexts.",
+        "If User.emailVerified is false, rejects request immediately with HTTP 403 Forbidden and code EMAIL_NOT_VERIFIED containing resendUrl.",
+        "Allows verified users with ARTIST role to proceed through upload execution handlers.",
+        "Explicitly leaves streaming, playback, search, following, and playlist endpoints ungated per DEC-004 and DEC-005.",
+        "Unit tests in src/middleware/requireVerifiedEmail.test.ts verify passthrough for verified users and rejection for unverified accounts.",
+        "Integration test verifies that POST /api/v1/tracks returns 403 when invoked by an unverified account."
+      ],
+      "priority": 30,
+      "passes": false,
+      "dependsOn": [
+        "STORY-role-003",
+        "STORY-security-005"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-role-005",
+      "title": "Implement Frontend Artist Upgrade Form and Settings Section",
+      "description": "Build the frontend artist role upgrade modal and account settings form component allowing Listeners to transition into Artists. Collects stageName, bio, and genreTags with client-side validation, submits data to POST /api/v1/users/me/upgrade-to-artist, updates global authentication state, and displays creator onboarding guidance.",
+      "acceptanceCriteria": [
+        "Renders form fields for stageName (1-50 chars), bio (max 500 chars), and genreTags (1-5 tags select) within account settings.",
+        "Complies with WCAG 2.1 AA keyboard accessibility standards and visible focus highlights per constraint [5].",
+        "On successful submission, updates session context with ARTIST role and redirects or shows artist dashboard link without requiring re-login.",
+        "Displays error alert banner if validation or API failure occurs.",
+        "Unit tests in src/components/ArtistUpgradeForm.test.tsx verify field validation, submission handling, and accessibility attributes.",
+        "Playwright spec in e2e/tests/artist-upgrade.spec.ts covers filling out the upgrade form, submitting, and verifying updated role state."
+      ],
+      "priority": 31,
+      "passes": false,
+      "dependsOn": [
+        "STORY-role-001",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-role-006",
+      "title": "Implement Frontend Email Verification Confirmation Page and Notification Banner",
+      "description": "Construct the email verification landing page (/verify-email) and sticky notification banner for unverified creator accounts. Reads the token query parameter on mount, invokes POST /api/v1/auth/verify-email/confirm, renders success or error confirmation states, and provides a one-click resend button triggering POST /api/v1/auth/verify-email/request.",
+      "acceptanceCriteria": [
+        "Landing page at /verify-email extracts token parameter and automatically triggers confirmation API request on load.",
+        "Renders success message with button to return to artist dashboard upon HTTP 200 OK response.",
+        "Renders error alert with explicit message and 'Resend Verification Email' action button when token is invalid or expired.",
+        "Displays a persistent banner in creator views when User.emailVerified is false, explaining upload gating per DEC-004.",
+        "Unit tests in src/pages/VerifyEmail.test.tsx verify token extraction, API invocation states, and error handling UI.",
+        "Playwright spec in e2e/tests/email-verification.spec.ts tests visiting /verify-email with valid and expired tokens."
+      ],
+      "priority": 32,
+      "passes": false,
+      "dependsOn": [
+        "STORY-role-003",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-001",
+      "title": "Implement Get Public Artist Profile API with Aggregated Metrics",
+      "description": "Develop the GET /api/v1/artists/:artistId endpoint to fetch public artist profiles, live tracks, and real-time aggregated metrics. Aggregates total plays across live tracks, total likes count, and followers count, and includes top 5 popular tracks ordered descending by play count.",
+      "acceptanceCriteria": [
+        "GET /api/v1/artists/:artistId returns public profile details (displayName, bio, avatarUrl, headerImageUrl, socialLinks, isVerified).",
+        "Calculates and returns aggregated stats: totalPlays (sum of live track playCounts), totalLikes (count of likes across tracks), and followerCount.",
+        "Returns top 5 tracks owned by artist with status 'LIVE' ordered descending by playCount.",
+        "Accessible to unauthenticated guest users per DEC-005, returning isFollowing boolean if authenticated request context exists.",
+        "Unit tests in src/services/artistProfile.test.ts cover aggregation calculations, popular track selection, and guest request handling.",
+        "Integration test calls GET /api/v1/artists/:artistId and verifies response schema, stats accuracy, and 200 HTTP status."
+      ],
+      "priority": 33,
+      "passes": false,
+      "dependsOn": [
+        "STORY-role-001",
+        "STORY-setup-008"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-002",
+      "title": "Implement Update Artist Profile API Endpoint and Payload Validation",
+      "description": "Create the PATCH /api/v1/artist-profile API endpoint allowing creators with the ARTIST role to update branding metadata. Validates payload fields against strict schema constraints (displayName 1-50 chars, bio max 500 chars, socialLinks max 5 HTTPS entries) and returns 422 error codes upon validation failure.",
+      "acceptanceCriteria": [
+        "PATCH /api/v1/artist-profile enforces ARTIST role authorization requirement.",
+        "Validates displayName (1-50 chars, trimmed), bio (max 500 chars), and socialLinks (max 5 items, valid HTTPS URLs with matching platforms).",
+        "Returns HTTP 422 Unprocessable Entity with codes INVALID_DISPLAY_NAME, BIO_TOO_LONG, or INVALID_SOCIAL_LINKS upon invalid payloads.",
+        "Returns HTTP 200 OK with the updated ArtistProfile payload upon successful modification.",
+        "Unit tests in src/validators/artistProfile.test.ts verify field validation rules and error payload generation.",
+        "Integration test executes PATCH /api/v1/artist-profile with valid and invalid payloads and verifies responses."
+      ],
+      "priority": 34,
+      "passes": false,
+      "dependsOn": [
+        "STORY-role-001",
+        "STORY-security-005"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-003",
+      "title": "Implement Avatar and Header Image Upload Endpoints for Artist Profiles",
+      "description": "Build the POST /api/v1/artist-profile/avatar and POST /api/v1/artist-profile/header endpoints for multipart image uploads. Validates image file sizes (max 5MB), MIME types (JPEG, PNG, WebP), uploads assets to cloud storage via StorageProvider, and updates avatarUrl or headerImageUrl on the ArtistProfile model.",
+      "acceptanceCriteria": [
+        "POST /api/v1/artist-profile/avatar and /header endpoints accept multipart image file uploads up to 5MB.",
+        "Validates MIME type to ensure file is image/jpeg, image/png, or image/webp, returning 422 INVALID_AVATAR_URL or INVALID_HEADER_URL on mismatch.",
+        "Uploads processed images to storage provider and updates target ArtistProfile record with HTTPS asset URL.",
+        "Requires ARTIST role authorization and returns updated profile payload in JSON envelope.",
+        "Unit tests in src/services/profileImageUpload.test.ts cover file type validation, size checking, and storage provider invocation.",
+        "Integration test posts image files to avatar/header endpoints and asserts HTTP 200 status and updated profile fields."
+      ],
+      "priority": 35,
+      "passes": false,
+      "dependsOn": [
+        "STORY-profile-002",
+        "STORY-storage-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-004",
+      "title": "Implement Listener Public Profile API Endpoint",
+      "description": "Develop the GET /api/v1/users/:userId endpoint for fetching public listener profiles. Returns basic user metadata (username, avatar, registration year), public playlists grid data (where isPublic=true), and a list of followed artists.",
+      "acceptanceCriteria": [
+        "GET /api/v1/users/:userId returns public user info including username, avatarUrl, and createdAt registration year.",
+        "Includes public playlists list created by the user where isPublic is true, formatted with title, trackCount, and cover mosaic.",
+        "Includes array of followed ArtistProfile summary objects.",
+        "Accessible to both authenticated users and unauthenticated guests per DEC-005.",
+        "Unit tests in src/services/listenerProfile.test.ts verify filtering of private playlists and proper profile serialization.",
+        "Integration test calls GET /api/v1/users/:userId and asserts HTTP 200 response with correct public data."
+      ],
+      "priority": 36,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-008"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-005",
+      "title": "Implement Account Suspension and Banned Status Profile Isolation Filter",
+      "description": "Implement global security filtering to soft-hide suspended or banned profiles and content per DEC-003. Ensures GET /api/v1/artists/:artistId and GET /api/v1/users/:userId return HTTP 404 Not Found when target accounts are suspended or banned, filtering them out of public searches and catalog queries.",
+      "acceptanceCriteria": [
+        "If a target User record has status 'SUSPENDED' or 'BANNED', profile endpoints GET /api/v1/artists/:artistId and GET /api/v1/users/:userId return HTTP 404 NOT_FOUND.",
+        "Filters out suspended or banned artists and their tracks from search indices and catalog listing queries.",
+        "Maintains database record integrity without hard-deleting underlying tracks or profiles per DEC-003.",
+        "Unit tests in src/middleware/statusIsolation.test.ts cover profile 404 responses for suspended and banned user states.",
+        "Integration test verifies that querying a suspended artist's profile route returns a standardized 404 error envelope."
+      ],
+      "priority": 37,
+      "passes": false,
+      "dependsOn": [
+        "STORY-profile-001",
+        "STORY-profile-004"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-006",
+      "title": "Implement Frontend Public Artist Profile Page and Discography View",
+      "description": "Construct the public artist profile view (/artists/[artistId]) displaying branding header, metrics bar, popular tracks section, and paginated discography. Renders dynamic header banner, circular avatar, follower count, follow/unfollow toggle, popular tracks table (top 5), and full track catalog with sorting options.",
+      "acceptanceCriteria": [
+        "Renders header banner image (16:9 ratio with default gradient fallback), 128x128px circular avatar, displayName, bio, and social links.",
+        "Displays metrics bar showing formatted total plays, total likes, and follower counts using compact notation (e.g. 1.2K).",
+        "Renders Popular Tracks section (up to 5 items) with inline play buttons, genre badges, duration, and play/like counts.",
+        "Displays full published track catalog with Release Date (default) and Title sort controls, supporting infinite scroll loading.",
+        "Includes interactive Follow/Unfollow button that toggles state for logged-in users and prompts login modal for guests.",
+        "Unit tests in src/pages/ArtistProfileView.test.tsx cover header rendering, stats formatting, track list sorting, and follow button interaction.",
+        "Playwright spec in e2e/tests/artist-profile.spec.ts verifies visiting /artists/[artistId], interacting with play triggers, and sorting discography."
+      ],
+      "priority": 38,
+      "passes": false,
+      "dependsOn": [
+        "STORY-profile-001",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-007",
+      "title": "Implement Frontend Artist Profile Management and Image Upload Dashboard",
+      "description": "Build the artist profile editing dashboard UI allowing creators to update stage name, bio, social links, and upload avatar/header banner images. Features drag-and-drop file uploaders with image preview cropped ratios, real-time character counters, and inline validation error messages.",
+      "acceptanceCriteria": [
+        "Provides form controls for editing stageName, bio (with 500-char counter), and up to 5 social links with platform selectors.",
+        "Includes file input uploaders for avatar (1:1 crop preview) and header banner (16:9 crop preview) with 5MB file size validation.",
+        "Submits image uploads to /api/v1/artist-profile/avatar and /header and metadata changes to PATCH /api/v1/artist-profile.",
+        "Displays toast notifications on successful save or inline error alerts on 422 response validation failures.",
+        "Unit tests in src/components/ArtistProfileEditor.test.tsx test preview generation, char counter math, and form submission.",
+        "Playwright spec in e2e/tests/artist-profile-edit.spec.ts covers modifying bio text, selecting avatar image, and saving profile changes."
+      ],
+      "priority": 39,
+      "passes": false,
+      "dependsOn": [
+        "STORY-profile-002",
+        "STORY-profile-003",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-profile-008",
+      "title": "Implement Frontend Public Listener Profile Page",
+      "description": "Construct the public listener profile page (/users/[userId]) displaying user avatar, registration year, public playlists grid, and followed artists carousel. Renders public playlist cards showing cover mosaics and track counts, alongside a horizontal slider of followed artists.",
+      "acceptanceCriteria": [
+        "Renders header section with user avatar, username, and registration year.",
+        "Displays Public Playlists Grid showing cards for playlists where isPublic is true, featuring cover art mosaic, title, and track count.",
+        "Renders Followed Artists Carousel allowing horizontal scroll through followed creator cards.",
+        "Complies with WCAG 2.1 AA keyboard accessibility and responsive layout guidelines down to 375px viewports per constraint [5].",
+        "Unit tests in src/pages/ListenerProfileView.test.tsx verify playlist grid rendering and followed artists carousel structure.",
+        "Playwright spec in e2e/tests/listener-profile.spec.ts tests loading a listener profile page and clicking a public playlist card."
+      ],
+      "priority": 40,
+      "passes": false,
+      "dependsOn": [
+        "STORY-profile-004",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-001",
+      "title": "Implement Track Upload Intent API Endpoint with Presigned URL Generation",
+      "description": "Develop the POST /api/v1/tracks/upload-intent endpoint validating media file parameters and issuing direct-to-storage presigned PUT URLs per DEC-008. Validates audio size (max 50MB per constraint [1]), audio MIME type (audio/mpeg, audio/wav), cover size (max 5MB), and returns short-lived S3/R2 presigned upload tokens.",
+      "acceptanceCriteria": [
+        "POST /api/v1/tracks/upload-intent checks requireVerifiedEmail gating rule and ARTIST role context.",
+        "Enforces max 50MB (52,428,800 bytes) audio file limit and audio/mpeg or audio/wav MIME types per constraint [1].",
+        "Enforces max 5MB cover image limit and image/jpeg, image/png, or image/webp MIME types.",
+        "Returns HTTP 200 OK with audioUploadUrl (15-min presigned PUT URL), audioStorageKey, optional coverImageUploadUrl/Key, and UTC ISO-8601 expiresAt timestamp.",
+        "Unit tests in src/services/uploadIntent.test.ts verify MIME type validation, file size checks, and presigned URL parameters.",
+        "Integration test calls POST /api/v1/tracks/upload-intent with valid payload and asserts response key formats and 200 status."
+      ],
+      "priority": 41,
+      "passes": false,
+      "dependsOn": [
+        "STORY-role-004",
+        "STORY-storage-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-002",
+      "title": "Implement Server-Side Audio Metadata Extraction and Binary Header Inspection Service",
+      "description": "Build an out-of-band audio processing service that inspects uploaded binary audio streams in storage to extract metadata. Reads headers to verify codec integrity, channel count, sample rate, bitrate, and precise duration in float seconds, detecting corrupted or spoofed audio files.",
+      "acceptanceCriteria": [
+        "Service connects via StorageProvider interface to read initial audio binary header bytes from storage.",
+        "Extracts precise track duration in float seconds (e.g. 218.42), bitrate, sample rate, and channel topology.",
+        "Verifies container format matches declared MIME type (MP3 or WAV per constraint [1]).",
+        "Throws a typed CorruptedAudioError if the file header is unparseable, incomplete, or corrupted.",
+        "Unit tests in src/services/audioMetadata.test.ts cover valid MP3/WAV header parsing and corrupted file detection.",
+        "Integration test executes metadata extraction against sample audio files in local test storage."
+      ],
+      "priority": 42,
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-003",
+      "title": "Implement Track Registration API Endpoint with Auto-Live Status and Cover Image Linking",
+      "description": "Create the POST /api/v1/tracks registration endpoint to finalize track publishing. Invokes the audio metadata extraction service, sets status to LIVE per auto-live decision DEC-001, assigns cover art (or fallback genre default), persists the Track document in MongoDB via Prisma, and returns the track payload.",
+      "acceptanceCriteria": [
+        "POST /api/v1/tracks validates title (1-100 chars), genre (normalized taxonomy), and audioStorageKey presence.",
+        "Triggers out-of-band audio duration extraction and stores floating-point seconds on Track.duration.",
+        "Sets Track.status to 'LIVE' automatically per DEC-001 without requiring pre-upload admin approval.",
+        "Links provided coverImageStorageKey or assigns default genre cover URL /static/covers/defaults/{genre}.png if omitted.",
+        "Returns HTTP 201 Created with full Track object containing UTC ISO-8601 timestamps per constraint [0].",
+        "Unit tests in src/services/trackRegistration.test.ts verify auto-live assignment, default cover art fallback, and metadata persistence.",
+        "Integration test calls POST /api/v1/tracks with valid keys and asserts 201 status and DB Track record."
+      ],
+      "priority": 43,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-001",
+        "STORY-track-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-004",
+      "title": "Implement Genre Tagging Validation and Search Indexing Trigger Service",
+      "description": "Implement genre validation against the normalized platform taxonomy (INDIE_ROCK, BEDROOM_POP, ELECTRONIC, HIP_HOP, LO_FI, AMBIENT, R_AND_B, FOLK, OTHER) and event dispatching for search indexing. Triggers background search index updates and genre queue aggregation upon track creation.",
+      "acceptanceCriteria": [
+        "Validates genre field against platform taxonomy enum values, rejecting invalid genres with 422 INVALID_GENRE_TAG.",
+        "Dispatches post-creation background event to index new track title, artist stageName, and genre in search layer.",
+        "Appends new track ID to the rule-based genre recommendation queue upon database insertion.",
+        "Unit tests in src/services/genreIndexing.test.ts cover taxonomy validation and indexing event payload creation.",
+        "Integration test verifies that creating a track fires the expected search indexing event trigger."
+      ],
+      "priority": 44,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-003"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-005",
+      "title": "Implement Storage Cleanup and Error Recovery Handlers for Upload Failures",
+      "description": "Develop error recovery workflows for corrupt audio files or failed registration payloads. If audio header parsing fails or validation errors occur during track registration, executes automatic StorageProvider.deleteObject calls for orphan storage keys and returns HTTP 422 CORRUPTED_AUDIO_FILE.",
+      "acceptanceCriteria": [
+        "If audio metadata extraction fails or header is corrupted, invokes StorageProvider.deleteObject on audioStorageKey and coverImageStorageKey.",
+        "Returns HTTP 422 Unprocessable Entity with error code CORRUPTED_AUDIO_FILE.",
+        "Handles missing storage key errors during registration by returning HTTP 404 STORAGE_KEY_NOT_FOUND.",
+        "Logs failure events with sanitized PII metadata for monitoring per cross-cutting guidelines sec-025.",
+        "Unit tests in src/services/uploadErrorRecovery.test.ts verify storage deletion invocation and error envelope generation.",
+        "Integration test simulates corrupted file header and verifies storage cleanup execution and 422 response."
+      ],
+      "priority": 45,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-003",
+        "STORY-storage-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-006",
+      "title": "Implement Frontend Track Upload Page and Interactive Multi-Step Upload Form",
+      "description": "Construct the frontend creator track upload page (/dashboard/upload) featuring file drag-and-drop pickers, direct presigned S3/R2 upload execution with real-time percentage progress bar, metadata entry form (title, genre, description, cover image), and auto-live success redirect.",
+      "acceptanceCriteria": [
+        "Renders drag-and-drop file upload zone enforcing client-side max 50MB size and MP3/WAV format checks per constraint [1].",
+        "Executes two-step upload flow: calls /upload-intent API, issues direct PUT request to presigned URL with visual progress bar, then submits metadata to /api/v1/tracks.",
+        "Provides form inputs for track title (1-100 chars), genre dropdown (platform taxonomy), description (max 500 chars), and cover art image picker.",
+        "Complies with WCAG 2.1 AA accessibility guidelines with aria-valuenow on progress bars and screen reader status updates per constraint [5].",
+        "Displays clear error banner and retry action if upload or metadata processing fails.",
+        "Unit tests in src/components/TrackUploadWizard.test.tsx test file drag-and-drop validation, upload progress calculation, and form submission.",
+        "Playwright spec in e2e/tests/track-upload.spec.ts tests picking an MP3 file, filling metadata, uploading, and verifying redirect to published track view."
+      ],
+      "priority": 46,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-001",
+        "STORY-track-003",
+        "STORY-storage-004",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-007",
+      "title": "Implement Track Metadata Update API Endpoint and Payload Validation",
+      "description": "Create the REST API endpoint PATCH /api/v1/tracks/[id] allowing Artists and Admins to modify track title, coverImageUrl, and genre tag. Enforce server-side identity and ownership verification, validate payload fields, reject immutable field edit attempts with HTTP 422 IMMUTABLE_FIELD_REJECTED, and trigger tag-based cache revalidation.",
+      "acceptanceCriteria": [
+        "PATCH /api/v1/tracks/[id] requires authentication and Artist or Admin role, returning 403 ARTIST_PROFILE_REQUIRED if requesting user has no associated ArtistProfile.",
+        "Server compares Track.artistProfileId against user's ArtistProfile.id, returning HTTP 403 Forbidden with code FORBIDDEN_OWNERSHIP_MISMATCH if mismatched and user is not Admin.",
+        "Payload validation accepts optional title (1-100 characters, trimmed), coverImageUrl (valid HTTP/S URL under 5MB), and genre (matching allowed system genre taxonomy).",
+        "Including any immutable field (audioUrl, duration, playCount, likeCount, artistProfileId) in the request body triggers HTTP 422 Unprocessable Entity with code IMMUTABLE_FIELD_REJECTED.",
+        "Successful metadata updates mutate database record, set updatedAt in UTC ISO-8601 format, revalidate cache tags (track-[id], artist-catalog-[artistProfileId], genre-feed-[genre]), and return 200 OK with updated metadata.",
+        "Admin-initiated metadata edits emit an immutable entry to AuditLog capturing admin user ID, track ID, and modified fields.",
+        "Integration tests in tests/api/track-update.test.ts call PATCH /api/v1/tracks/[id] with valid owner payload (asserts 200), immutable payload (asserts 422), unauthorized user (asserts 403), and non-existent track (asserts 404)."
+      ],
+      "priority": 47,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006",
+        "STORY-track-003",
+        "STORY-security-005"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-008",
+      "title": "Implement Asynchronous Storage Cleanup for Replaced Track Cover Art",
+      "description": "Create an asynchronous storage cleanup background job triggered when a track's coverImageUrl is updated via PATCH /api/v1/tracks/[id]. Extract the previous cover image key and execute StorageProvider.deleteFile() out-of-band to prevent storage waste.",
+      "acceptanceCriteria": [
+        "When PATCH /api/v1/tracks/[id] updates coverImageUrl to a new URL, the handler enqueues a background task with the previous cover art storage key.",
+        "Asynchronous job invokes StorageProvider.deleteFile(key) to permanently delete the orphaned cover image asset from object storage (S3/R2).",
+        "If coverImageUrl is omitted or unchanged in the update payload, no storage deletion job is enqueued.",
+        "Storage provider deletion failures are logged as structured errors and retried without blocking or failing the HTTP PATCH response.",
+        "Unit tests in tests/unit/cover-art-cleanup.test.ts verify that StorageProvider.deleteFile() is called with the exact previous key when coverImageUrl changes."
+      ],
+      "priority": 48,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-007",
+        "STORY-storage-001"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-009",
+      "title": "Implement Track Soft Archival Deletion Endpoint and Stream Interceptor",
+      "description": "Create the DELETE /api/v1/tracks/[id] endpoint to soft-delete tracks by setting deletedAt to the current UTC ISO-8601 timestamp and status to archived. Update streaming route handlers to intercept requests for soft-deleted tracks and return HTTP 404 TRACK_ARCHIVED.",
+      "acceptanceCriteria": [
+        "DELETE /api/v1/tracks/[id] requires authentication and ownership verification (or Admin role), returning 403 FORBIDDEN_OWNERSHIP_MISMATCH on mismatch.",
+        "Successful deletion updates Track.deletedAt to current UTC ISO-8601 timestamp and sets Track.status to archived.",
+        "Global data access queries enforce mandatory filter deletedAt: null, instantly hiding soft-deleted tracks from search, feeds, recommendations, artist profiles, and follower activity feeds.",
+        "GET /api/v1/tracks/[id]/stream checks deletedAt !== null or status === 'archived' and returns HTTP 404 with structured error body { \"error\": { \"code\": \"TRACK_ARCHIVED\", \"message\": \"This track is no longer available.\" } }.",
+        "Admin track soft-deletion emits an entry to AuditLog capturing admin ID, track ID, and timestamp.",
+        "Integration tests in tests/api/track-delete.test.ts verify soft-archival database state, 404 response on streaming archived track, and 403 on unauthorized deletion."
+      ],
+      "priority": 49,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006",
+        "STORY-track-007",
+        "STORY-storage-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-010",
+      "title": "Implement Synchronous Playlist Cascade Cleanup and Catalog Counter Sync",
+      "description": "Create a synchronous database cascade cleanup service executed during track soft-deletion. Purge all PlaylistTrack junction records referencing the track, re-index position ordering for remaining playlist items, decrement playlist track counts, and decrement artist total track count.",
+      "acceptanceCriteria": [
+        "Triggered synchronously within single database transaction during DELETE /api/v1/tracks/[id] processing.",
+        "Executes batch deletion of all PlaylistTrack junction records referencing the soft-deleted track ID.",
+        "Re-indexes remaining PlaylistTrack positions (position = position - 1 for position > deletedTrackPosition) per affected playlist.",
+        "Decrements trackCount metric on all affected Playlist records by 1.",
+        "Decrements trackCount metric on the track owner's ArtistProfile record by 1.",
+        "Invalidates cache tags for affected playlists and artist catalog listings.",
+        "Integration tests in tests/services/playlist-cascade.test.ts assert PlaylistTrack purge, position re-indexing without gaps, and accurate trackCount decrements on Playlist and ArtistProfile."
+      ],
+      "priority": 50,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-009"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-011",
+      "title": "Implement Asynchronous Storage Media Asset Purging Pipeline for Archived Tracks",
+      "description": "Implement the TrackMediaPurgeJob background task queue worker that permanently deletes physical audio (audioStorageKey) and cover image (coverStorageKey) files from object storage (S3/R2) following track soft-deletion.",
+      "acceptanceCriteria": [
+        "Triggered asynchronously via task queue event emitted after successful Track soft-deletion.",
+        "TrackMediaPurgeJob retrieves audioStorageKey and coverStorageKey for the archived track ID.",
+        "Invokes StorageProvider.deleteFile() for both the audio binary asset and cover image asset.",
+        "Handles missing keys or storage API failures with exponential backoff retries and structured error logging.",
+        "Preserves database record in archived state for analytical history while confirming storage objects are purged.",
+        "Unit and integration tests in tests/jobs/track-media-purge.test.ts verify worker invocation, target storage key deletion calls, and error retry handling."
+      ],
+      "priority": 51,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-009",
+        "STORY-storage-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-012",
+      "title": "Implement Frontend Artist Catalog Management Page and Track Edit Form",
+      "description": "Build the artist catalog management interface and interactive track metadata edit modal using Next.js, React Hook Form, and shadcn/ui. Enable artists to view uploaded tracks and edit title, cover artwork URL/file, and genre tag with real-time feedback.",
+      "acceptanceCriteria": [
+        "Renders artist catalog list displaying track artwork, title, genre badge, upload timestamp, play count, and Edit/Delete action controls.",
+        "Clicking Edit opens a modal dialog pre-populated with current title, cover image, and genre dropdown matching system taxonomy.",
+        "Validates form inputs displaying inline errors for title (1-100 characters) and invalid cover image URLs or files over 5MB.",
+        "Submitting form calls PATCH /api/v1/tracks/[id] and updates catalog list UI state and Next.js revalidated data upon 200 OK success response.",
+        "Modal and form elements satisfy WCAG 2.1 AA accessibility guidelines (keyboard focus trapping, ARIA dialog labels, visible focus rings).",
+        "Playwright spec in e2e/tests/artist-catalog-edit.spec.ts verifies opening edit modal, modifying title and genre, submitting valid form, and asserting updated UI listing."
+      ],
+      "priority": 52,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-007",
+        "STORY-profile-007"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-track-013",
+      "title": "Implement Frontend Track Deletion Dialog and Active Player Queue Synchronization",
+      "description": "Build the track deletion confirmation dialog in the artist catalog dashboard and implement real-time player bar and queue state synchronization when an actively playing or queued track is edited or soft-deleted.",
+      "acceptanceCriteria": [
+        "Clicking Delete in artist catalog opens a confirmation dialog warning that soft-archiving removes the track from user playlists.",
+        "Confirming deletion calls DELETE /api/v1/tracks/[id] and removes track row from artist catalog UI upon 200 OK.",
+        "If active playing track metadata is modified by the artist, persistent player bar updates title and artwork seamlessly without interrupting playback.",
+        "If actively playing/queued track is deleted, browser audio buffer plays to completion, player marks queue item unavailable, displays toast notification ('Track removed by artist'), and advances to next valid queue item.",
+        "Confirmation dialog and player alerts comply with WCAG 2.1 AA keyboard accessibility and screen reader announcement standards (aria-live).",
+        "Playwright spec in e2e/tests/artist-catalog-delete.spec.ts covers deletion dialog confirmation, catalog item removal, and player toast notification trigger on active track deletion."
+      ],
+      "priority": 53,
+      "passes": false,
+      "dependsOn": [
+        "STORY-track-009",
+        "STORY-track-012"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-player-001",
+      "title": "Implement Audio Player React Context and Session Persistence Provider",
+      "description": "Create the AudioPlayerProvider React context wrapper in app/layout.tsx above child page routes. The provider maintains global player state, encapsulates a hidden HTML5 audio element, exposes useAudioPlayer(), and persists session metadata to browser sessionStorage under indie_player_session for seamless state restoration on tab reloads.",
+      "acceptanceCriteria": [
+        "AudioPlayerProvider is mounted in app/layout.tsx root layout and exposes useAudioPlayer() context hook to all child page routes.",
+        "Player state encapsulates PlaybackStatus ('IDLE', 'LOADING', 'BUFFERING', 'PLAYING', 'PAUSED', 'ERROR'), currentTrack metadata, currentTime, duration, volume, isMuted, repeatMode ('OFF', 'ALL', 'ONE'), and isShuffleActive.",
+        "A hidden HTML5 <audio> element is mounted inside AudioPlayerProvider and abstracts native events (timeupdate, ended, waiting, playing, error, stalled) into application state updates.",
+        "Active track and queue state are automatically mirrored to sessionStorage under key indie_player_session upon state changes.",
+        "On tab reload, the provider restores track metadata and seek timestamp from indie_player_session in a PAUSED state without triggering immediate auto-play.",
+        "Unit tests in context/AudioPlayerContext.test.tsx verify state transitions, event subscriptions, and sessionStorage serialization.",
+        "Playwright spec in e2e/tests/player-persistence.spec.ts verifies player state remains active across client-side page route navigation."
+      ],
+      "priority": 54,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-002",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-player-002",
+      "title": "Implement Audio Player Queue State Engine and Shuffling Actions",
+      "description": "Implement in-memory queue management logic inside AudioPlayerProvider with a hard cap of 500 items. Provides queue manipulation actions including immediate track play with context queue, insertion next, appending to queue end, drag-and-drop reordering, Fisher-Yates shuffle toggle preserving original queue order, and repeat mode management.",
+      "acceptanceCriteria": [
+        "Queue state maintains originalQueue, activeQueue, historyStack, and currentIndex with an enforced maximum limit of 500 items.",
+        "playTrackImmediately(track, contextQueue) loads target track, updates activeQueue with context queue if supplied, and sets currentIndex.",
+        "insertQueueNext(tracks) appends target tracks directly after currentIndex, while addToQueueEnd(tracks) appends items to the end of activeQueue.",
+        "playNextTrack() and playPreviousTrack() correctly navigate activeQueue, handling historyStack pops and repeatMode ('OFF', 'ALL', 'ONE') boundaries.",
+        "toggleShuffle() creates a randomized permutation of activeQueue items following currentIndex using the Fisher-Yates algorithm while preserving originalQueue.",
+        "Disabling shuffle restores activeQueue to originalQueue while matching currentIndex to the currently active track.",
+        "Unit tests in utils/queueEngine.test.ts cover queue insertion, reordering, Fisher-Yates shuffle integrity, and repeat mode boundary conditions."
+      ],
+      "priority": 55,
+      "passes": false,
+      "dependsOn": [
+        "STORY-player-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-player-003",
+      "title": "Implement Persistent Bottom Audio Player Bar UI Component",
+      "description": "Build the persistent AudioPlayerBar component fixed to the bottom of the viewport in root layout. Features track cover art and title display, play/pause controls, seek progress slider with visual drag jitter protection, volume slider with logarithmic scaling, mute toggle, and retry handling for stream buffering and network errors.",
+      "acceptanceCriteria": [
+        "AudioPlayerBar component is rendered in app/layout.tsx and styled with fixed bottom positioning using dark-mode design system tokens.",
+        "Displays current track cover art, track title, artist name, current seek position, and total duration formatted as MM:SS.",
+        "Seek slider supports click-jump and drag scrubbing, pausing timeupdate event updates during drag to eliminate thumb jitter.",
+        "Volume slider maps normalized float (0.0-1.0) to audio element volume using logarithmic formula V_effective = V^2.5 and persists setting under localStorage key indie_player_volume.",
+        "Toggling mute silences output while preserving previous volume level for restoration upon unmute.",
+        "Stream errors trigger up to 3 retry attempts with exponential backoff (1s, 2s, 4s) before showing a non-blocking toast error in player UI.",
+        "Component unit tests in components/player/AudioPlayerBar.test.tsx verify play/pause toggles, volume scaling, seek events, and error UI states.",
+        "Playwright spec in e2e/tests/player-bar.spec.ts verifies audio playback controls and volume persistence."
+      ],
+      "priority": 56,
+      "passes": false,
+      "dependsOn": [
+        "STORY-player-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-player-004",
+      "title": "Implement Slide-Out Queue Drawer Overlay Component",
+      "description": "Build the slide-out queue overlay panel component toggled from the player bar. Displays the current track, upcoming queued tracks, track durations, drag-and-drop item reordering controls, track removal buttons, and a clear queue action.",
+      "acceptanceCriteria": [
+        "Slide-out queue panel opens via a queue toggle button on AudioPlayerBar with accessible overlay backdrop.",
+        "Renders currently playing track highlight alongside the scrollable list of activeQueue items.",
+        "Supports drag-and-drop repositioning of queued tracks, calling reorderQueue(startIndex, endIndex) without interrupting active playback.",
+        "Individual tracks can be removed via a delete button, triggering removeFromQueue(index).",
+        "Clear queue button empties activeQueue up to the current playing track and updates queue drawer state.",
+        "Component unit tests in components/player/QueueDrawer.test.tsx verify render list, drag reordering triggers, and clear queue button actions.",
+        "Playwright spec in e2e/tests/queue-drawer.spec.ts verifies opening the drawer, reordering items, and removing tracks."
+      ],
+      "priority": 57,
+      "passes": false,
+      "dependsOn": [
+        "STORY-player-002",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "haiku"
+    },
+    {
+      "id": "STORY-player-005",
+      "title": "Implement MediaSession API Integration and Platform Keyboard Shortcuts",
+      "description": "Integrate the browser navigator.MediaSession API to sync playback state and metadata with OS hardware media controls. Implement platform-wide keyboard hotkeys for play/pause, seek, volume, and track skip, along with WCAG 2.1 AA ARIA attributes and screen reader announcements.",
+      "acceptanceCriteria": [
+        "navigator.mediaSession.metadata is updated on track load with title, artist, album name, and cover artwork variants (96x96, 256x256, 512x512).",
+        "Binds MediaSession action handlers for play, pause, previoustrack, nexttrack, seekto, and stop.",
+        "Global keyboard hotkeys are active platform-wide: Space/K (Play/Pause), M (Mute), Left/Right Arrows (5s seek), J/L (10s seek), Shift+N/P (Next/Prev track).",
+        "Keyboard shortcuts are automatically suppressed when user focus resides inside input fields, textareas, or select dropdowns.",
+        "Seek and volume sliders include role='slider', aria-valuenow, aria-valuemin, aria-valuemax, aria-valuetext, and 2px high-contrast focus rings.",
+        "An aria-live='polite' screen reader region announces track changes ('Now playing: Track Title by Artist Name').",
+        "Unit tests in hooks/useMediaSession.test.tsx and hooks/usePlayerHotkeys.test.tsx cover event binding and input suppression logic.",
+        "Playwright spec in e2e/tests/player-accessibility.spec.ts verifies hotkey execution and ARIA slider attributes."
+      ],
+      "priority": 58,
+      "passes": false,
+      "dependsOn": [
+        "STORY-player-001",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-player-006",
+      "title": "Implement Unauthenticated Guest Playback and Auth Prompt Interceptor",
+      "description": "Ensure unauthenticated guest users can stream public tracks and public playlists without login tokens. Add an authentication modal trigger interceptor when guest users click interactive social buttons (Like, Follow, Save) on the persistent player bar UI without halting active playback.",
+      "acceptanceCriteria": [
+        "Guest users can stream public tracks using signed GET media delivery URLs without requiring auth tokens.",
+        "Guest player bar maintains session queue and volume preferences in sessionStorage and localStorage.",
+        "Clicking 'Like Track', 'Follow Artist', or 'Save to Playlist' from the player bar while unauthenticated triggers the auth prompt modal.",
+        "Audio playback continues uninterrupted in background while the auth prompt modal is visible.",
+        "Unit tests in components/player/GuestAuthInterceptor.test.tsx verify social action interception for guests.",
+        "Playwright spec in e2e/tests/guest-playback.spec.ts verifies unauthenticated track playback and auth modal trigger."
+      ],
+      "priority": 59,
+      "passes": false,
+      "dependsOn": [
+        "STORY-player-001",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "haiku"
+    },
+    {
+      "id": "STORY-listen-001",
+      "title": "Implement Play Session Initialization API Endpoint",
+      "description": "Create the POST /api/v1/tracks/:id/play-session API endpoint that issues a time-bound HMAC-SHA256 signed playbackToken containing trackId, sessionId, issuedAt, and requiredThresholdSeconds calculated as min(30s, 0.5 * duration).",
+      "acceptanceCriteria": [
+        "Endpoint POST /api/v1/tracks/:id/play-session accepts trackId parameter and returns 200 OK with PlaySessionResponse.",
+        "Calculates requiredThresholdSeconds as min(30, 0.5 * Track.duration) based on database Track record.",
+        "Generates HMAC-SHA256 signed playbackToken containing trackId, sessionId, issuedAt (UTC ISO-8601), and requiredThresholdSeconds.",
+        "Sets playbackToken expiry timestamp to issuedAt + Track.duration + 30 seconds.",
+        "Endpoint accepts both guest user sessions and authenticated user requests.",
+        "Service unit tests verify calculation of threshold for tracks < 60s and >= 60s and HMAC token signature validity.",
+        "Integration test calls POST /api/v1/tracks/:id/play-session with valid trackId and asserts 200 status and PlaySessionResponse body schema."
+      ],
+      "priority": 60,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-setup-006"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-listen-002",
+      "title": "Implement Play Beacon API Endpoint and Deduplication Verification Engine",
+      "description": "Create the POST /api/v1/tracks/:id/play-beacon endpoint to process client playback completion payloads. Validates token signature, token expiry, wall-clock time elapsed, IP/user rate limits (30 req/min), and 60-minute sliding window deduplication against PlayLog records.",
+      "acceptanceCriteria": [
+        "Endpoint POST /api/v1/tracks/:id/play-beacon accepts PlayBeaconPayload and verifies HMAC-SHA256 signature of playbackToken.",
+        "Validates that wall-clock elapsed time (Current UTC - issuedAt) is >= requiredThresholdSeconds, returning 422 REJECTED if violated.",
+        "Enforces rate limit of 30 requests per minute per IP address / user session token, returning 429 Too Many Requests when exceeded.",
+        "Checks PlayLog collection for prior qualified plays of same trackId by same userId (or IP hash for guests) within a 60-minute sliding window.",
+        "If deduplicated, returns 200 OK with status 'DEDUPLICATED' and playCountIncremented: false.",
+        "If qualified, returns 200 OK with status 'QUALIFIED' and playCountIncremented: true.",
+        "Integration test calls POST /api/v1/tracks/:id/play-beacon with valid token, expired token, early payload, and duplicate play within 60m to assert status codes."
+      ],
+      "priority": 61,
+      "passes": false,
+      "dependsOn": [
+        "STORY-listen-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-listen-003",
+      "title": "Implement Real-Time Track Increment and Async Artist Play Counter Worker",
+      "description": "Implement counter synchronization logic for qualified play events. Synchronously executes atomic $inc on Track.playCount, logs an append-only PlayLog record, and queues play events for a 30-second background worker that executes bulk updates on ArtistProfile.totalPlays.",
+      "acceptanceCriteria": [
+        "Upon qualified play beacon approval, synchronously executes atomic $inc update on Track.playCount via Prisma ORM.",
+        "Inserts an append-only PlayLog document recording trackId, artistProfileId, userId (nullable), ipAddressHash, countryCode, and UTC timestamp.",
+        "Enqueues play event message to an in-memory queue processed by a background worker every 30 seconds.",
+        "Background worker aggregates queued plays by artistProfileId and performs bulk atomic $inc updates on ArtistProfile.totalPlays.",
+        "Unit tests in services/playCountAggregator.test.tsx verify atomic track counter increments and background worker batch aggregations.",
+        "Integration test verifies calling play-beacon increments Track.playCount immediately and ArtistProfile.totalPlays after background worker execution."
+      ],
+      "priority": 62,
+      "passes": false,
+      "dependsOn": [
+        "STORY-listen-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-listen-004",
+      "title": "Implement Client-Side Listen Threshold Beacon Dispatcher Hook",
+      "description": "Build the useListenThreshold React hook integrated with AudioPlayerProvider. Monitors active playback time (excluding paused/buffering/muted state and forward seeks), requests playbackToken on track start, and dispatches play beacon via navigator.sendBeacon() or keepalive fetch upon reaching threshold.",
+      "acceptanceCriteria": [
+        "useListenThreshold hook initializes on track load by requesting a playbackToken from POST /api/v1/tracks/:id/play-session.",
+        "Accumulates active playing time only while audio element is in playing state (ignoring paused, buffering, muted, or skipped segments).",
+        "Seeking backward resumes duration accumulation from target timestamp without double-counting previously played ranges.",
+        "When accumulated time meets requiredThresholdSeconds, dispatches payload to POST /api/v1/tracks/:id/play-beacon via navigator.sendBeacon() or fetch with keepalive: true.",
+        "Unit tests in hooks/useListenThreshold.test.tsx verify accumulation timer logic, pause/mute exclusion, seek handling, and beacon dispatch.",
+        "Playwright spec in e2e/tests/listen-threshold.spec.ts verifies playing a track for 30 seconds triggers the play-beacon network call."
+      ],
+      "priority": 63,
+      "passes": false,
+      "dependsOn": [
+        "STORY-player-001",
+        "STORY-listen-001",
+        "STORY-listen-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-001",
+      "title": "Implement Playlist Creation API Endpoint and Owner Initialization",
+      "description": "Implement the POST /api/v1/playlists endpoint allowing authenticated users to create a new playlist with title, description, and visibility setting. Initializes the Playlist record assigned to the requesting user with zero tracks and zero total duration.",
+      "acceptanceCriteria": [
+        "POST /api/v1/playlists accepts JSON payload with required title (1-100 chars), optional description (0-500 chars), and optional isPublic boolean (default false).",
+        "Rejects unauthenticated requests with HTTP status 401 Unauthorized.",
+        "Returns HTTP 201 Created containing full PlaylistMetadata object with ISO-8601 UTC timestamps.",
+        "Initializes trackCount to 0 and totalDurationSeconds to 0 upon creation.",
+        "Unit tests in src/services/playlist.service.test.ts cover valid playlist creation and title character validation errors.",
+        "Integration test calls POST /api/v1/playlists with valid JWT and asserts 201 Created and response payload structure."
+      ],
+      "priority": 64,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-setup-006",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-002",
+      "title": "Implement Playlist Ownership Authorization Helper and Metadata Update Endpoints",
+      "description": "Implement server-side owner authorization logic alongside PATCH /api/v1/playlists/:id and DELETE /api/v1/playlists/:id endpoints. Enforces 403 Forbidden for non-owners and performs atomic cascade deletion of playlist track junction records.",
+      "acceptanceCriteria": [
+        "PATCH /api/v1/playlists/:id allows updating title, description, and coverImageUrl for the owning user.",
+        "DELETE /api/v1/playlists/:id atomically removes the Playlist record and cascade deletes associated PlaylistTrack records.",
+        "Returns HTTP 403 Forbidden with error code FORBIDDEN when requested by an authenticated user who is not the playlist owner.",
+        "Recalculates and updates the updatedAt timestamp in ISO-8601 UTC format upon metadata mutation.",
+        "Unit tests verify ownership assertion helper with matching and non-matching user IDs.",
+        "Integration test asserts PATCH and DELETE endpoints enforce 403 for non-owners and 200 for valid owners."
+      ],
+      "priority": 65,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-001",
+        "STORY-security-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-003",
+      "title": "Implement Playlist Track Addition and Removal API Endpoints",
+      "description": "Implement POST /api/v1/playlists/:id/tracks and DELETE /api/v1/playlists/:id/tracks/:playlistTrackId endpoints with dense position shift sequencing logic and atomic trackCount/totalDurationSeconds cache updates.",
+      "acceptanceCriteria": [
+        "POST /api/v1/playlists/:id/tracks inserts a track into a playlist, defaulting position to max(position) + 1 if unspecified.",
+        "If a specific position P is requested, shifts existing track positions >= P up by 1 before inserting.",
+        "DELETE /api/v1/playlists/:id/tracks/:playlistTrackId removes the target track and shifts remaining track positions > removedPos down by 1.",
+        "Track additions and deletions atomically increment/decrement trackCount and totalDurationSeconds on the parent Playlist.",
+        "Validates that target Track exists and holds live status prior to insertion.",
+        "Unit tests in src/services/playlist-track.service.test.ts cover position recalculations and duration counter updates.",
+        "Integration test asserts POST and DELETE track endpoints execute correct DB state changes and response structures."
+      ],
+      "priority": 66,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-002",
+        "STORY-track-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-004",
+      "title": "Implement Playlist Track Reordering API Endpoint with Transactional Shifting",
+      "description": "Implement the PUT /api/v1/playlists/:id/tracks/reorder endpoint using an atomic Prisma transaction to shift track positions UP or DOWN while maintaining dense 1-indexed integer sequences.",
+      "acceptanceCriteria": [
+        "PUT /api/v1/playlists/:id/tracks/reorder accepts playlistTrackId, fromPosition, and toPosition payload.",
+        "Executes reordering inside a single Prisma transaction to avoid position collisions or gaps.",
+        "Shifts intermediate track positions UP when moving a track down, and DOWN when moving a track up.",
+        "Validates pre-conditions: 1 <= fromPosition <= trackCount and 1 <= toPosition <= trackCount.",
+        "Returns HTTP 200 OK with success indicator upon completion.",
+        "Unit tests cover edge cases including moving top track to bottom, bottom track to top, and no-op identical position movement.",
+        "Integration test calls PUT /api/v1/playlists/:id/tracks/reorder and verifies resulting dense sequential order in database."
+      ],
+      "priority": 67,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-005",
+      "title": "Implement Frontend Interactive Playlist Management and Drag-and-Drop Editor Page",
+      "description": "Implement the Next.js playlist management page and track reordering UI using @hello-pangea/dnd, optimistic ordering updates, rollback error toast handling, and WCAG 2.1 AA keyboard movement controls.",
+      "acceptanceCriteria": [
+        "Renders track list with drag handles supporting pointer drag-and-drop reordering.",
+        "Applies optimistic local state reordering on drag end, triggering API reorder call in the background.",
+        "Automatically reverts to pre-drag order and displays an error toast if API reorder fails.",
+        "Provides accessible row overflow options: 'Move Up', 'Move Down', and 'Move to Position...' modal conforming to WCAG 2.1 AA.",
+        "Component unit tests cover drag handle rendering and keyboard accessibility menu interactions.",
+        "Playwright spec in e2e/tests/playlist-editor.spec.ts verifies drag reordering, position prompt modal, and failure rollback."
+      ],
+      "priority": 68,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-004",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-006",
+      "title": "Implement Playlist Visibility Toggle API Endpoint and Share URL Generator",
+      "description": "Implement PATCH /api/v1/playlists/:id/visibility endpoint allowing playlist owners to toggle public visibility and receive a shareable canonical URL.",
+      "acceptanceCriteria": [
+        "PATCH /api/v1/playlists/:id/visibility accepts payload with boolean isPublic flag.",
+        "Enforces owner-only modification checks, returning 403 Forbidden for non-owners.",
+        "Returns HTTP 200 OK containing updated isPublic status and canonical shareUrl (https://platform.domain/playlists/:id).",
+        "Unit tests verify share URL construction from environment domain configuration and playlist ID.",
+        "Integration test asserts PATCH /api/v1/playlists/:id/visibility updates isPublic flag in DB and returns 200 OK."
+      ],
+      "priority": 69,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-002"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-007",
+      "title": "Implement Public and Private Playlist Detail API Endpoint with Access Controls",
+      "description": "Implement GET /api/v1/playlists/:id endpoint returning full playlist metadata, owner info, and ordered track items. Enforces 404 Not Found masking for private playlists requested by non-owners or guests.",
+      "acceptanceCriteria": [
+        "GET /api/v1/playlists/:id returns 200 OK with full playlist metadata, owner details, and ordered track list for public playlists.",
+        "Returns HTTP 404 Not Found with error code ERR_PLAYLIST_NOT_FOUND when requesting a private playlist as guest or non-owner.",
+        "Returns HTTP 200 OK when requesting a private playlist as the authenticated owner.",
+        "Populates owner profile (displayName, handle, avatarUrl) and track artist details in response payload.",
+        "Unit tests in src/services/playlist-access.test.ts verify public vs private permission matrix enforcement.",
+        "Integration tests assert GET /api/v1/playlists/:id returns 200 for public/owner requests and 404 for unauthorized private requests."
+      ],
+      "priority": 70,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-006"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-008",
+      "title": "Implement Dynamic OpenGraph Metadata Generator and Composite Social Image Endpoint",
+      "description": "Implement Next.js generateMetadata for /playlists/:id pages and GET /api/v1/playlists/:id/og-image endpoint synthesizing a 1200x630 social preview image with cache headers.",
+      "acceptanceCriteria": [
+        "GET /api/v1/playlists/:id/og-image generates a 1200x630 composite image featuring cover art (or 2x2 track artwork grid), title, owner name, and track count.",
+        "Sets Cache-Control header to public, max-age=86400, s-maxage=604800 on image responses.",
+        "Next.js generateMetadata dynamically injects og:title, og:description, og:image, and twitter:card HTML meta tags.",
+        "Unit test verifies OG image composition logic and composite image generation parameters.",
+        "Integration test calls GET /api/v1/playlists/:id/og-image and asserts 200 OK with image/png or image/jpeg content type."
+      ],
+      "priority": 71,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-007"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-playlist-009",
+      "title": "Implement Frontend Public Playlist View Page and Guest Streaming Integration",
+      "description": "Implement the /playlists/:id public playlist page, allowing unauthenticated guest users to view playlist track lists and execute audio streaming directly via player context.",
+      "acceptanceCriteria": [
+        "Renders public playlist metadata, owner handle, total track count, aggregate duration, and ordered track rows.",
+        "Allows unauthenticated guest users to initiate stream playback for any track without forcing auth redirection.",
+        "Populates audio player context queue with the playlist's ordered track list upon playback initiation.",
+        "Displays 404 page when attempting to access a private playlist URL as a guest user.",
+        "Component unit tests verify playlist metadata rendering and queue initialization hooks.",
+        "Playwright spec in e2e/tests/public-playlist.spec.ts verifies unauthenticated playlist viewing and audio playback triggering."
+      ],
+      "priority": 72,
+      "passes": false,
+      "dependsOn": [
+        "STORY-playlist-007",
+        "STORY-player-006"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-search-001",
+      "title": "Configure MongoDB Compound Text Indexes and Search Optimization Indexes",
+      "description": "Define and apply compound MongoDB text indexes across Track, ArtistProfile, and Playlist collections in the Prisma and database schema configuration to enable rapid parallel search execution. Includes supporting filter indexes for status, creation dates, play counts, and visibility flags to guarantee API query execution under 200ms.",
+      "acceptanceCriteria": [
+        "Track collection contains compound text index `{ title: 'text', genre: 'text' }` with weights `{ title: 10, genre: 5 }` and supporting filter indexes `{ status: 1, createdAt: -1 }` and `{ status: 1, playCount: -1 }`.",
+        "ArtistProfile collection contains text index `{ stageName: 'text', bio: 'text' }` with weights `{ stageName: 10, bio: 2 }` and supporting index `{ userId: 1 }`.",
+        "Playlist collection contains text index `{ title: 'text', description: 'text' }` with weights `{ title: 10, description: 3 }` and supporting index `{ isPublic: 1, createdAt: -1 }`.",
+        "Database index setup script initializes text and filter indexes without error or service disruption.",
+        "Unit tests verify index schema definitions and compound key configurations against target database specifications."
+      ],
+      "priority": 73,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-search-002",
+      "title": "Implement Global Search API Endpoint with Parallel Multi-Entity Query Execution",
+      "description": "Build the `GET /api/v1/search` REST API endpoint that sanitizes user input, tokenizes query strings, and executes parallel MongoDB queries across Track, ArtistProfile, and Playlist collections using Promise.all(). Supports entity type filtering, genre filtering, relevance/popularity/recent sorting, guest user access, and strict exclusion of banned user content or non-public items.",
+      "acceptanceCriteria": [
+        "GET /api/v1/search accepts query parameter `q` (2-100 chars), trimming whitespace, removing control characters, and splitting into search tokens while honoring quoted phrases.",
+        "Executes parallel MongoDB $text search for queries 3 characters or longer, and falls back to index-anchored prefix regex (`^query`) on Track.title and ArtistProfile.stageName for 2-character inputs.",
+        "Filters search results to omit non-live tracks (`status != 'live'`), private playlists (`isPublic != true`), and entities linked to banned or suspended users per DEC-003.",
+        "Allows unauthenticated guest requests without requiring Bearer tokens or session cookies in compliance with DEC-005.",
+        "Supports `type` ('all', 'tracks', 'artists', 'playlists'), `genre` filter, and `sort` ('relevance', 'popularity', 'recent') parameters, returning payloads adhering to SearchAPIResponse with timestamps in UTC ISO-8601 format.",
+        "Enforces sliding-window API rate limiting middleware on `/api/v1/search` per cross-cutting security specifications.",
+        "Integration test calls GET /api/v1/search with valid search queries and asserts 200 OK status, grouped payload structure, and correct filtering/sorting behavior.",
+        "Unit tests in search.service.test.ts cover query sanitization, tokenization, stop-word removal, and score tie-breaking logic."
+      ],
+      "priority": 74,
+      "passes": false,
+      "dependsOn": [
+        "STORY-search-001",
+        "STORY-setup-006",
+        "STORY-setup-008"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-search-003",
+      "title": "Implement Client Search Bar Component with Debounced Input and Auto-Suggestions",
+      "description": "Build a persistent search bar UI component for the main navigation layout featuring 300ms input debouncing and an interactive auto-suggestions dropdown overlay. Displays top matching tracks, artists, and playlists when the user enters 2+ characters, with full keyboard navigation support.",
+      "acceptanceCriteria": [
+        "Search bar input component renders in the header layout, triggering auto-suggest API calls only after 300ms of typing inactivity.",
+        "Auto-suggest dropdown overlay activates when input length is 2 or more non-whitespace characters, requesting `limit=3` in unified mode to render up to 3 tracks, 2 artists, and 2 public playlists.",
+        "Supports WCAG 2.1 AA compliant keyboard interaction: `ArrowDown` and `ArrowUp` cycle through items, `Enter` opens the selected item or submits search, and `Escape` dismisses the overlay.",
+        "Renders entity thumbnails, titles, secondary metadata (artist name, genre, duration, follower count), and hover/focus highlight states conforming to design system tokens down to 375px viewports.",
+        "Unit tests verify input debounce timing, overlay visibility state triggers, and query length threshold gating.",
+        "Playwright spec in e2e/tests/search-bar.spec.ts verifies user typing, debounced suggestion popup, keyboard navigation, and selection click navigation."
+      ],
+      "priority": 75,
+      "passes": false,
+      "dependsOn": [
+        "STORY-search-002",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-search-004",
+      "title": "Implement Frontend Global Search Results Page with Tabbed Filtering and Sorting",
+      "description": "Build the dedicated `/search` page providing a comprehensive search results view. Includes tabbed entity navigation ('All', 'Tracks', 'Artists', 'Playlists'), genre dropdown filtering, sort controls ('Relevance', 'Popularity', 'Release Date'), and paginated result lists with inline track playback integration.",
+      "acceptanceCriteria": [
+        "The `/search?q={query}` page renders grouped results across tracks, artists, and playlists when type is 'all', and single-entity paginated views when switching entity tabs.",
+        "Provides interactive controls for genre tag filtering and sort selection ('relevance', 'popularity', 'recent'), updating URL search params dynamically.",
+        "Track result rows include play buttons that directly load selected tracks into the global audio player context.",
+        "Displays clean empty state UI with helpful messaging when search queries return zero results.",
+        "Layout adapts responsively down to 375px viewports and meets WCAG 2.1 AA keyboard focus and color contrast standards.",
+        "Unit tests cover URL query parameter synchronization, tab switching, and filter state updates.",
+        "Playwright spec in e2e/tests/search-page.spec.ts verifies entity tab switching, genre filter application, sort order changes, and playing a track directly from search results."
+      ],
+      "priority": 76,
+      "passes": false,
+      "dependsOn": [
+        "STORY-search-002",
+        "STORY-search-003",
+        "STORY-player-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-like-001",
+      "title": "Implement Track Like and Unlike API Endpoints with Atomic Counter Aggregation",
+      "description": "Create the REST API endpoints for liking and unliking tracks for authenticated listeners. Enforce idempotency using a compound unique index on [userId, trackId] in the Like model, and execute Prisma transactions to atomically update track likes count and artist total likes.",
+      "acceptanceCriteria": [
+        "POST /api/v1/tracks/:id/like creates a Like record and returns HTTP 201 Created with LikeToggleResponse containing trackId, isLiked: true, and updated likesCount.",
+        "Duplicate POST requests for an existing like return HTTP 200 OK without creating duplicate records or double-incrementing counters.",
+        "DELETE /api/v1/tracks/:id/like removes the Like record and returns HTTP 200 OK with isLiked: false and updated likesCount.",
+        "Updates to Track.likesCount (+1/-1, bounded at min 0) and track creator ArtistProfile.totalLikes (+1/-1, bounded at min 0) execute atomically in a single Prisma database transaction.",
+        "Unauthenticated requests to POST or DELETE like endpoints return HTTP 401 Unauthorized error envelope.",
+        "API rate limiting policy for user interaction endpoints is configured to prevent automated like spam. (sec-025)",
+        "All timestamp fields (Like.createdAt) are returned in UTC ISO-8601 format. (Constraint 0)",
+        "Integration test calls POST and DELETE endpoints with valid session tokens and asserts database counter mutations and idempotent responses."
+      ],
+      "priority": 77,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-setup-006",
+        "STORY-setup-007",
+        "STORY-track-003",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-like-002",
+      "title": "Implement User Liked Tracks Collection API Endpoint",
+      "description": "Create the GET /api/v1/users/me/likes API endpoint to fetch a paginated collection of tracks liked by the currently authenticated user. Results are sorted by like creation timestamp in descending order.",
+      "acceptanceCriteria": [
+        "GET /api/v1/users/me/likes returns HTTP 200 OK with a paginated array of liked Track entities for the requesting authenticated user.",
+        "Endpoint enforces standard limit-offset pagination contracts with default 20 items and maximum cap of 100 items.",
+        "Results are strictly ordered by Like.createdAt in descending order (newest likes first) and include hasLiked: true.",
+        "Unauthenticated requests to /api/v1/users/me/likes return HTTP 401 Unauthorized.",
+        "All returned track timestamps conform to UTC ISO-8601 format. (Constraint 0)",
+        "Integration test verifies authenticating as a user with liked tracks, validating pagination offset limits and correct sorting order."
+      ],
+      "priority": 78,
+      "passes": false,
+      "dependsOn": [
+        "STORY-like-001",
+        "STORY-setup-008"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-like-003",
+      "title": "Implement Session-Based Track Like State Hydration in Track List API Handlers",
+      "description": "Enhance track list and track detail API handlers across search, genre browsing, and artist profile endpoints to inspect user session tokens and embed a hasLiked boolean field on track objects.",
+      "acceptanceCriteria": [
+        "When an authenticated user requests track lists (search, artist catalog, genre feeds), each Track object includes hasLiked: true if a Like record exists for [userId, trackId], else false.",
+        "When an unauthenticated guest requests track lists, hasLiked defaults to false for all returned Track objects.",
+        "Track list queries execute batched Like lookup queries indexed by [userId, trackId] to prevent N+1 database queries.",
+        "Integration test verifies that track listing endpoints return accurate hasLiked boolean flags for authenticated vs unauthenticated session tokens."
+      ],
+      "priority": 79,
+      "passes": false,
+      "dependsOn": [
+        "STORY-like-001",
+        "STORY-search-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-like-004",
+      "title": "Implement Frontend Track Like Heart Button Component with Optimistic UI State",
+      "description": "Build a reusable client-side Heart Toggle Button component that displays like counts, performs instant optimistic UI updates on click, and gracefully handles network failure rollbacks.",
+      "acceptanceCriteria": [
+        "Clicking the Heart button immediately toggles visual active state and increments/decrements likesCount before API network response completes.",
+        "If the asynchronous POST/DELETE request fails, component reverts visual state and likesCount to previous values and displays an error toast notification.",
+        "Unauthenticated guest clicks interrupt action and launch the authentication modal prompt.",
+        "Component supports interactive states (hover, focus, active, loading) conforming to design system tokens and WCAG 2.1 AA accessibility guidelines with aria-label attributes. (sec-026, Constraint 5)",
+        "Unit tests in components/like-button.test.tsx verify optimistic state toggling, rollback handling on API failure, and accessibility attributes."
+      ],
+      "priority": 80,
+      "passes": false,
+      "dependsOn": [
+        "STORY-like-001",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-like-005",
+      "title": "Implement Frontend Liked Tracks Library Page with Queue Playback Integration",
+      "description": "Build the frontend Liked Tracks library page for authenticated listeners featuring paginated track lists, Play All and Shuffle Play actions, and persistent player queue integration.",
+      "acceptanceCriteria": [
+        "The /collection/tracks page renders the user's liked tracks using infinite scroll pagination via GET /api/v1/users/me/likes.",
+        "Play All button populates the persistent audio player queue state engine with all liked tracks in current sorted order and triggers playback of the first track.",
+        "Shuffle Play button populates the persistent audio player queue with a randomized order of liked tracks and starts playback.",
+        "Page layout is responsive across desktop, tablet, and mobile viewports down to 375px width. (sec-024, sec-026)",
+        "Playwright spec in e2e/tests/liked-tracks.spec.ts covers navigating to Liked Tracks page, triggering Play All, unliking a track, and verifying queue population."
+      ],
+      "priority": 81,
+      "passes": false,
+      "dependsOn": [
+        "STORY-like-002",
+        "STORY-like-004",
+        "STORY-player-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-follow-001",
+      "title": "Implement Follow and Unfollow Artist API Endpoints with Atomic Metric Aggregation",
+      "description": "Create POST and DELETE /api/v1/artists/:artistId/follow endpoints to manage user follow relationships with artists. Validate that users cannot follow their own artist profile and return 404 for non-existent or soft-hidden artists per DEC-003. Execute follow/unfollow operations inside Prisma transactions using atomic $inc operations to update the ArtistProfile followerCount.",
+      "acceptanceCriteria": [
+        "POST /api/v1/artists/:artistId/follow returns 201 Created with FollowActionResponse payload containing updated followerCount and isFollowing: true for authenticated users.",
+        "POST /api/v1/artists/:artistId/follow returns 422 Unprocessable Entity if User.id equals target ArtistProfile.userId (self-following prevention).",
+        "POST /api/v1/artists/:artistId/follow returns 200 OK with isFollowing: true without duplicating counter increments if the follow relationship already exists.",
+        "DELETE /api/v1/artists/:artistId/follow removes the Follow record and returns 200 OK with isFollowing: false and atomically decremented followerCount with zero lower-bound protection.",
+        "Follow and unfollow actions return 404 Not Found if target ArtistProfile does not exist or has been soft-hidden per DEC-003.",
+        "Follow write endpoints enforce rate limiting policy per sec-025.",
+        "Unit tests cover follow validation logic and transactional counter increments, while integration tests verify POST and DELETE /api/v1/artists/:artistId/follow HTTP responses and status codes."
+      ],
+      "priority": 82,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-setup-007",
+        "STORY-profile-001",
+        "STORY-profile-005"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-follow-002",
+      "title": "Implement Follow Status Verification Endpoint and Follower Count Reconciliation Cron Job",
+      "description": "Implement the GET /api/v1/artists/:artistId/follow-status endpoint to verify whether the requesting user follows a specific artist. Create a background cron task scheduled for daily execution at 03:00 UTC that recalculates raw Follow document counts per ArtistProfile and reconciles followerCount metric drift.",
+      "acceptanceCriteria": [
+        "GET /api/v1/artists/:artistId/follow-status returns 200 OK with FollowStatusResponse payload { artistId, isFollowing } for authenticated requests.",
+        "GET /api/v1/artists/:artistId/follow-status returns 401 Unauthorized for unauthenticated guest requests signaling client UI to default to unfollowed state.",
+        "Daily background worker runs at 03:00 UTC to compute count() of Follow records per artist and reconcile any followerCount drift in ArtistProfile.",
+        "API endpoint responds within SLA targets per sec-024 performance guidelines.",
+        "Unit tests cover count drift reconciliation logic and integration tests assert GET /api/v1/artists/:artistId/follow-status response structure and unauthenticated 401 status."
+      ],
+      "priority": 83,
+      "passes": false,
+      "dependsOn": [
+        "STORY-follow-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-follow-003",
+      "title": "Implement Personalized Activity Feed API Endpoint with Keyset Pagination",
+      "description": "Build the GET /api/v1/feed/activity endpoint delivering a reverse-chronological stream of newly published live tracks from artists followed by the user. Support keyset pagination via ISO-8601 UTC timestamp cursor and limit parameters (default 20, max 100), while filtering out tracks from suspended or banned artists per DEC-003.",
+      "acceptanceCriteria": [
+        "GET /api/v1/feed/activity returns 200 OK with ActivityFeedResponse payload containing items array, nextCursor ISO-8601 UTC timestamp string, and hasMore boolean.",
+        "Feed query includes only tracks with status 'live' from ArtistProfiles currently followed by the requesting user.",
+        "Tracks in the activity feed are ordered strictly by createdAt DESC.",
+        "Tracks uploaded by suspended or banned artists are dynamically excluded from the feed at query execution time per DEC-003.",
+        "Supports limit query parameter defaulted to 20 with a hard maximum cap of 100 items per page.",
+        "Unit tests cover feed query building and pagination cursor logic, and integration tests verify GET /api/v1/feed/activity filtering, ordering, and payload schema."
+      ],
+      "priority": 84,
+      "passes": false,
+      "dependsOn": [
+        "STORY-follow-001",
+        "STORY-profile-005",
+        "STORY-track-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-follow-004",
+      "title": "Implement Frontend Artist Follow Button Component with Optimistic UI and Toast Rollback",
+      "description": "Develop an interactive reusable Follow Button component for artist profile pages and cards. Hydrate state via GET /api/v1/artists/:artistId/follow-status, execute optimistic UI transitions (+1 follower count, label switch to 'Following') upon click, and automatically revert state with a toast notification if the network request fails.",
+      "acceptanceCriteria": [
+        "Follow Button component renders 'Follow' or 'Following' state based on initial follow status check API response.",
+        "Toggling follow instantly updates button label to 'Following' and increments displayed follower count by +1 before server response resolves.",
+        "If API request fails with error, UI reverts button state, decrements follower count by -1, and displays toast notification 'Unable to update follow status. Please try again.'",
+        "Button states and focus styles comply with WCAG 2.1 AA keyboard and screen reader accessibility guidelines per constraint 5 and sec-024.",
+        "Component unit tests verify optimistic state mutations and error rollbacks, while Playwright spec in e2e/tests/follow-button.spec.ts tests user interaction, optimistic update, and network error recovery."
+      ],
+      "priority": 85,
+      "passes": false,
+      "dependsOn": [
+        "STORY-follow-001",
+        "STORY-follow-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-follow-005",
+      "title": "Implement Frontend Activity Feed Page Layout, Track Cards, and Empty States",
+      "description": "Build the `/feed` client page displaying a single-column release stream (max-width 768px) of new tracks from followed artists. Implement feed cards with artist avatar links, release timestamps, 1:1 cover art, genre badges, inline playback triggers connected to the global audio player bar, quick action menus, keyset infinite scrolling, and zero-follow / zero-upload empty states.",
+      "acceptanceCriteria": [
+        "Unauthenticated access to `/feed` automatically redirects guest users to `/login?redirect=/feed`.",
+        "Renders single-column activity feed layout (maximum container width 768px) responsive down to 375px mobile viewports per sec-024.",
+        "Feed cards render artist avatar thumbnail, artistName link to `/artists/:id`, relative release timestamp, track cover art (1:1 aspect ratio), title, genre pill badge, and quick action menu.",
+        "Card inline play button directly triggers track playback via the global persistent audio player bar.",
+        "Renders zero-follow empty state with CTA navigating to `/search` when user follows 0 artists, and zero-upload empty state when followed artists have no tracks.",
+        "Implements infinite scrolling via IntersectionObserver cursor fetch adhering to design system patterns per sec-026.",
+        "Playwright spec in e2e/tests/activity-feed.spec.ts covers authenticated page access, infinite scroll loading, player playback integration, and empty state rendering."
+      ],
+      "priority": 86,
+      "passes": false,
+      "dependsOn": [
+        "STORY-follow-003",
+        "STORY-follow-004",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-recommend-001",
+      "title": "Implement User Genre Affinity Vector and Candidate Overlap Scoring Engine",
+      "description": "Implement the server-side genre affinity vector calculator and candidate track overlap scoring service for authenticated users. Computes genre affinity scores using a 90-day sliding window of explicit track likes (weight 2.0) and valid listens (weight 1.0). Batch-projects user history to calculate candidate track match scores efficiently in memory.",
+      "acceptanceCriteria": [
+        "AffinityScore(g) formula computes (2.0 * LikesCount_g) + (1.0 * PlaysCount_g) for each genre g based on interaction events within a 90-day UTC window.",
+        "Single batch projection query retrieves user Like and valid listen records projecting only genre and createdAt fields.",
+        "Candidate matchScore is computed as the sum of AffinityScore(g) across all genre tags attached to a candidate track.",
+        "Calculated affinity vector is cached in memory per request lifecycle to avoid redundant database reads.",
+        "Unit tests in src/services/recommendation-affinity.test.ts cover affinity score calculation, 90-day cutoff boundary filtering, and weight aggregation."
+      ],
+      "priority": 87,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-listen-002",
+        "STORY-like-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-recommend-002",
+      "title": "Implement Played Track Exclusion and Multi-Tiered Artist Diversity Interleaving Engine",
+      "description": "Implement candidate filtering and multi-tiered sorting logic for recommendation feed candidates. Excludes tracks played by the user within 90 days, non-live tracks, and content from soft-hidden artists per DEC-003. Applies tie-breaking rules (recency, play count) and an artist diversity interleaving algorithm ensuring no two back-to-back tracks originate from the same artist.",
+      "acceptanceCriteria": [
+        "Tracks present in the user's valid listen history within the past 90 days are excluded from the candidate pool.",
+        "Tracks with status other than 'live' or belonging to soft-hidden/suspended artists per DEC-003 are filtered out.",
+        "Tie-breaking hierarchy orders candidates by recency (createdAt DESC) first, then global play count (playCount DESC).",
+        "applyArtistDiversity algorithm re-orders candidate tracks using a minimum buffer of 2 positions to prevent identical artist IDs from appearing consecutively.",
+        "Unit tests in src/services/recommendation-interleaving.test.ts cover played track exclusion, soft-hidden filtering, and artist interleaving edge cases."
+      ],
+      "priority": 88,
+      "passes": false,
+      "dependsOn": [
+        "STORY-recommend-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-recommend-003",
+      "title": "Implement Recommendation Cold-Start Fallback Strategy Engine for Guest and New Users",
+      "description": "Implement the cold-start fallback recommendation workflow for unauthenticated guests and newly registered users without listen history per DEC-005. Dynamically retrieves top 5 platform-wide genres based on 30-day play counts, fetches trending tracks by 7-day velocity, and falls back to global recent live tracks.",
+      "acceptanceCriteria": [
+        "Identifies cold-start conditions when a request is unauthenticated or user affinity history yields zero genres.",
+        "Selects top 5 platform-wide genres aggregated over the past 30 days of play events.",
+        "Fetches top 50 live tracks across selected genres sorted by 7-day play count velocity.",
+        "Falls back to the 50 most recently published live tracks if genre aggregates are empty or sparse.",
+        "Unit tests in src/services/recommendation-coldstart.test.ts cover guest fallback, empty history handling, and trending velocity calculations."
+      ],
+      "priority": 89,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-recommend-004",
+      "title": "Implement Recommendation Feed REST API Endpoint with Query Optimization",
+      "description": "Implement the GET /api/v1/recommendations API route supporting optional authentication, pagination (limit, offset), and optional seedGenre filtering. Integrates affinity scoring, cold-start detection, candidate capping (top 200 via MongoDB compound index), and returns the standardized recommendation feed payload.",
+      "acceptanceCriteria": [
+        "Route GET /api/v1/recommendations responds to both authenticated users and unauthenticated guests per DEC-005.",
+        "Supports query parameters limit (default 20, max 50), offset (default 0), and optional seedGenre filtering.",
+        "Candidate pool database query caps candidate evaluation to top 200 tracks using compound index { status: 1, genres: 1, createdAt: -1 }.",
+        "Response payload conforms strictly to RecommendationFeedResponse schema including isColdStart boolean flag and paginated items.",
+        "Endpoint response latency resolves within sub-50ms under baseline load.",
+        "Integration test calls GET /api/v1/recommendations with valid session cookie and guest headers, asserting response status 200 and schema validity."
+      ],
+      "priority": 90,
+      "passes": false,
+      "dependsOn": [
+        "STORY-recommend-001",
+        "STORY-recommend-002",
+        "STORY-recommend-003",
+        "STORY-setup-006"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-recommend-005",
+      "title": "Implement Frontend Recommended Music Discovery View and Genre Filter Component",
+      "description": "Implement the user-facing recommendation discovery section and feed page with interactive seed genre pills, cold-start indicator badge, track play controls, and pagination. Connects to GET /api/v1/recommendations and integrates with the persistent audio player queue context.",
+      "acceptanceCriteria": [
+        "Discovery feed page renders recommended track cards with cover image, title, artist handle, genre tags, and match score badge.",
+        "Interactive seed genre pill filter allows filtering recommendations by specific genre context with responsive layout down to 375px viewports.",
+        "Displays a subtle 'Trending Discovery' cold-start indicator badge when response isColdStart flag is true.",
+        "Clicking play on any track card enqueues the recommendation feed into the persistent audio player context.",
+        "Interactive elements (genre pills, play buttons) comply with WCAG 2.1 AA keyboard navigation and focus ring standards.",
+        "Playwright spec in e2e/tests/recommendations.spec.ts verifies feed rendering, genre pill filtering, cold-start indicator display, and track playback trigger."
+      ],
+      "priority": 91,
+      "passes": false,
+      "dependsOn": [
+        "STORY-recommend-004",
+        "STORY-player-001",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-report-001",
+      "title": "Implement Track Report Submission API Endpoint with Rate Limiting",
+      "description": "Create the backend REST endpoint POST /api/v1/tracks/:trackId/reports to allow authenticated users and guest visitors to flag policy-violating tracks. The handler enforces sliding-window rate limits (5 per hour for registered users, 3 per hour per IP for guests), rejects duplicate reports within 24 hours with an HTTP 409 Conflict, and records reporter details or guest IP before creating a Report record.",
+      "acceptanceCriteria": [
+        "POST /api/v1/tracks/:trackId/reports accepts valid payloads with enumerated reasons (COPYRIGHT_VIOLATION, INAPPROPRIATE_CONTENT, SPAM_OR_MISLEADING, OTHER) and optional details capped at 500 characters, returning HTTP 201 Created with the persisted Report object.",
+        "Returns HTTP 404 Not Found if the specified trackId does not exist or is not active.",
+        "For authenticated requests, reporterId is populated from the JWT user session; for guest submissions, reporterId is set to null and client IP is logged.",
+        "Enforces sliding-window rate limits returning 429 Too Many Requests: 5 submissions/hour for authenticated users and 3 submissions/hour per IP for unauthenticated guests as specified in sec-025.",
+        "Rejects duplicate report submissions for the same track from the same User ID or IP address within a 24-hour window with HTTP 409 Conflict.",
+        "Timestamps in the created Report entity are stored in UTC ISO-8601 format per constraint 0.",
+        "Integration test in tests/api/reports.test.ts verifies successful creation, 404 missing track, 409 duplicate submission, and 429 rate limit enforcement."
+      ],
+      "priority": 92,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-setup-006",
+        "STORY-security-002"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-report-002",
+      "title": "Implement Frontend Track Report Modal and Feedback Component",
+      "description": "Develop the client-side report modal accessible from track card action menus and the persistent player bar. The modal presents a mandatory reason dropdown, optional details text area with character counter, Submit/Cancel controls, inline error alerts, and a confirmation screen that auto-dismisses after 3 seconds while triggering a global toast notification.",
+      "acceptanceCriteria": [
+        "Track report modal opens via 'Report Track' action menu item on all track cards and player bar views, conforming to WCAG 2.1 AA keyboard trap and screen reader accessibility guidelines per constraint 5 and sec-024.",
+        "Dropdown requires selecting a valid reason enum (COPYRIGHT_VIOLATION, INAPPROPRIATE_CONTENT, SPAM_OR_MISLEADING, OTHER) and enforces a 500-character limit on the optional details textarea.",
+        "Submitting dispatches POST /api/v1/tracks/:trackId/reports and displays a loading spinner on the submit button.",
+        "On HTTP 201 Created response, modal transitions to confirmation view displaying 'Thank you. Your report has been submitted for moderation review.', automatically dismisses after 3 seconds, and fires a success toast.",
+        "On HTTP 409 or 429 errors, displays an inline alert inside the modal without clearing user inputs.",
+        "Styled using dark-mode HSL design tokens and shadcn/ui Dialog/Select components per sec-026.",
+        "Unit tests in components/ReportModal.test.tsx cover form validation and state transitions; Playwright spec in e2e/tests/report-modal.spec.ts verifies opening, submitting, auto-dismissing, and error alerts."
+      ],
+      "priority": 93,
+      "passes": false,
+      "dependsOn": [
+        "STORY-report-001",
+        "STORY-setup-003",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-moderation-001",
+      "title": "Implement Admin Moderation Queue REST API Endpoint",
+      "description": "Build the backend API endpoint GET /api/v1/admin/reports to return user-submitted content flags requiring evaluation. The endpoint is protected by admin RBAC middleware and supports query parameters for status, reason, slaBreach, limit, and offset, computing real-time DMCA 48-hour SLA remaining seconds and breach status for each pending item.",
+      "acceptanceCriteria": [
+        "GET /api/v1/admin/reports requires an authenticated JWT session with admin role; unauthenticated requests return 401 Unauthorized and non-admin requests return 403 Forbidden per constraint 3.",
+        "Supports query parameters status (PENDING, RESOLVED_APPROVED, RESOLVED_REJECTED), reason, slaBreach (boolean), limit (default 20, max 100), and offset per sec-004 contract.",
+        "Response payload includes report details, reporter info (masked IP for guests), target track metadata (title, coverImageUrl, status, artistId, artistName), and ISO-8601 UTC timestamps per constraint 0.",
+        "Computes slaRemainingSeconds (172800 seconds minus elapsed time since createdAt) and sets isSlaBreached = true if slaRemainingSeconds <= 0.",
+        "Integration test in tests/api/admin-reports.test.ts asserts 401/403 guards for unauthorized users, 200 OK payload schema, pagination parameters, and SLA calculation accuracy."
+      ],
+      "priority": 94,
+      "passes": false,
+      "dependsOn": [
+        "STORY-report-001",
+        "STORY-setup-007",
+        "STORY-security-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-moderation-002",
+      "title": "Implement Admin Content Takedown and Report Dismissal APIs",
+      "description": "Implement POST /api/v1/admin/reports/:reportId/approve and POST /api/v1/admin/reports/:reportId/reject endpoints. Approval executes an atomic transaction setting Report.status to RESOLVED_APPROVED and Track.status to takedown (isLive = false), excluding the track from search/recs and revoking presigned playback URLs, while writing an immutable AuditLog record.",
+      "acceptanceCriteria": [
+        "POST /api/v1/admin/reports/:reportId/approve and .../reject enforce server-side admin role check via middleware returning 401/403 for non-admins per constraint 3.",
+        "Approve endpoint executes an atomic Prisma transaction: sets Report.status = RESOLVED_APPROVED, updates resolvedAt (UTC ISO-8601 per constraint 0), sets Track.status = takedown, and sets isLive = false.",
+        "Taken-down tracks are excluded from search queries, recommendation feeds, and return 404 Not Found on presigned URL generation requests and 403 on active stream segments.",
+        "Reject endpoint executes an atomic Prisma transaction: sets Report.status = RESOLVED_REJECTED, updates resolvedAt, and leaves Track.status as live.",
+        "Both endpoints write an immutable AuditLog entry recording adminId, action (REPORT_APPROVED_UNPUBLISH or REPORT_REJECTED_DISMISS), targetEntityId, adminNotes, and duration in milliseconds per sec-025.",
+        "Integration test in tests/api/admin-takedown.test.ts verifies atomic status transitions, AuditLog creation, and presigned stream URL HTTP 404 rejection post-takedown."
+      ],
+      "priority": 95,
+      "passes": false,
+      "dependsOn": [
+        "STORY-moderation-001",
+        "STORY-setup-004",
+        "STORY-storage-003"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-moderation-003",
+      "title": "Implement Frontend Admin Moderation Queue Dashboard",
+      "description": "Develop the React view at /admin/moderation displaying user-submitted track reports in a tabular layout. Includes color-coded DMCA 48-hour SLA countdown badges (green/amber/red/pulsing red), an isolated track stream preview modal, and action buttons to approve takedown or reject reports.",
+      "acceptanceCriteria": [
+        "/admin/moderation page is guarded by Next.js server middleware, redirecting unauthenticated or non-admin users to /login with an error parameter per constraint 3.",
+        "Table renders Report ID, timestamp, target track title & cover, artist name, reporter identity (masked IP for guests), violation category, notes, and SLA badge.",
+        "SLA badge dynamically renders green (>24h), amber (12-24h), red (<12h), or pulsing red banner (breached) based on isSlaBreached and slaRemainingSeconds.",
+        "Clicking track preview opens an isolated admin audio player modal to listen to the reported track without altering user queue state.",
+        "Approve Takedown and Reject buttons trigger confirmation modals with mandatory admin notes text fields, invoking the respective approval/rejection endpoints.",
+        "Page responsive layout supports viewports down to desktop/tablet screens using design system tokens per sec-026.",
+        "Unit test in pages/admin/moderation.test.tsx verifies table filtering and badge rendering; Playwright spec in e2e/tests/admin-moderation.spec.ts tests complete report approval and rejection workflows."
+      ],
+      "priority": 96,
+      "passes": false,
+      "dependsOn": [
+        "STORY-moderation-002",
+        "STORY-setup-003",
+        "STORY-player-003"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-usermod-001",
+      "title": "Implement Admin User Management List API Endpoint",
+      "description": "Create the backend REST endpoint GET /api/v1/admin/users allowing platform admins to list, search, and filter user accounts. Supports query parameters for status (active, suspended, banned), role (listener, artist, admin), partial email search, and standard limit-offset pagination, returning total track and report counts for each account.",
+      "acceptanceCriteria": [
+        "GET /api/v1/admin/users requires admin role authorization via server middleware, returning 401 Unauthorized or 403 Forbidden for unauthorized requests per constraint 3.",
+        "Supports query parameters: status (active, suspended, banned, all), role (listener, artist, admin, all), email (partial search string), limit (default 20, max 100), and offset.",
+        "Returns array of users with id, email, role, status, createdAt (UTC ISO-8601 per constraint 0), tracksCount, and reportsCount.",
+        "Passwords and password hashes are strictly excluded from response payloads per constraint 4.",
+        "Integration test in tests/api/admin-users.test.ts verifies pagination, filtering by role/status, partial email search matching, and admin permission enforcement."
+      ],
+      "priority": 97,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004",
+        "STORY-setup-007",
+        "STORY-security-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-usermod-002",
+      "title": "Implement Admin User Status Mutation API and Session Revocation",
+      "description": "Build PATCH /api/v1/admin/users/:userId/status to update account states to active, suspended, or banned. Enforces mandatory reason payload validation, prevents moderating Admin accounts (403 CANNOT_MODERATE_ADMIN), sets user.tokenInvalidatedBefore to trigger immediate session revocation in authentication middleware, and writes an AuditLog entry.",
+      "acceptanceCriteria": [
+        "PATCH /api/v1/admin/users/:userId/status validates payload: status ('active', 'suspended', 'banned'), mandatory reason string, and optional suspensionDurationDays.",
+        "Returns HTTP 422 Unprocessable Entity with code REASON_REQUIRED if reason is empty or omitted.",
+        "Rejects attempts to suspend or ban users with the Admin role, returning HTTP 403 Forbidden with code CANNOT_MODERATE_ADMIN.",
+        "When transitioning status to suspended or banned, updates User.tokenInvalidatedBefore to current UTC time (constraint 0); authentication middleware rejects tokens with iat < tokenInvalidatedBefore with 401 SESSION_REVOKED.",
+        "Writes a synchronous AuditLog record containing action (USER_SUSPENDED, USER_BANNED, or USER_REINSTATED), adminId, targetUserId, previousStatus, newStatus, reason, and metadata per sec-025.",
+        "Integration test in tests/api/admin-user-status.test.ts verifies status transition, 403 on admin targeting, 422 on missing reason, AuditLog creation, and token invalidation timestamp update."
+      ],
+      "priority": 98,
+      "passes": false,
+      "dependsOn": [
+        "STORY-usermod-001",
+        "STORY-security-002",
+        "STORY-security-003"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-usermod-003",
+      "title": "Implement Content Soft-Hide and Reinstatement Engine for Moderated Accounts",
+      "description": "Implement the platform-wide content visibility engine enforcing decision DEC-003. When a user is suspended or banned, an atomic database transaction sets isSoftHidden = true on all tracks and public playlists owned by the user. Upon account reinstatement to active, soft-hidden items are set to isSoftHidden = false (preserving independent DMCA takedowns), immediately restoring search and stream visibility.",
+      "acceptanceCriteria": [
+        "Account status change to suspended or banned triggers an atomic transaction setting isSoftHidden = true on all Track records linked to the user's ArtistProfile and all Playlist records owned by the user.",
+        "Read queries for global search, genre browse, and recommendation feeds enforce isSoftHidden: false filter, excluding soft-hidden tracks and playlists.",
+        "Navigating to an artist profile or playlist page of a suspended/banned user returns HTTP 404 Not Found; direct audio presigned URL requests return HTTP 404/410 Gone.",
+        "Account reinstatement to active sets isSoftHidden = false for user tracks and playlists, while preserving status = 'takedown' for tracks independently removed via DMCA moderation under sec-021.",
+        "Retains user records, audio files, and playlist definitions indefinitely in database and cloud storage without hard deletion.",
+        "Unit tests in services/visibilityEngine.test.ts and integration tests in tests/api/soft-hide.test.ts verify atomic flag updates, query filtering, and preservation of DMCA takedown states during reinstatement."
+      ],
+      "priority": 99,
+      "passes": false,
+      "dependsOn": [
+        "STORY-usermod-002",
+        "STORY-moderation-002",
+        "STORY-search-001"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-usermod-004",
+      "title": "Implement Frontend Admin User Moderation Management Dashboard",
+      "description": "Develop the React user management interface at /admin/users. Features a tabular list displaying user identity, role badges, status badges, registration date, published tracks count, and flag counts, with filtering by status/role, search by email, and a status action modal supporting suspension duration and mandatory justification text.",
+      "acceptanceCriteria": [
+        "/admin/users route is protected server-side via Next.js middleware, redirecting unauthenticated or non-admin users to /login per constraint 3.",
+        "Renders management table with columns: ID, Email, Role (listener, artist, admin), Status (active, suspended, banned), Registration Date (UTC ISO-8601 per constraint 0), Tracks Count, and Reports Count.",
+        "Provides UI filter dropdowns for Status and Role, alongside a debounced search input for partial email matching.",
+        "Clicking 'Update Status' opens a modal with a status selector (active, suspended, banned), optional suspension duration in days, and a mandatory reason textarea.",
+        "Submitting modal dispatches PATCH /api/v1/admin/users/:userId/status; displays inline validation error if reason is empty or if API returns CANNOT_MODERATE_ADMIN.",
+        "Responsive design and dark-mode styling built using shadcn/ui Table, Dialog, Select, and Badge components per sec-026.",
+        "Unit tests in pages/admin/users.test.tsx verify table filtering and modal validation; Playwright spec in e2e/tests/admin-users.spec.ts tests user status updates and table search."
+      ],
+      "priority": 100,
+      "passes": false,
+      "dependsOn": [
+        "STORY-usermod-003",
+        "STORY-setup-003"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-analytics-001",
+      "title": "Implement Daily Platform Statistics Aggregation Cron Job and Metric Snapshot Model",
+      "description": "Creates the PlatformMetricSnapshot database model and an out-of-band daily background CRON job running at 00:00 UTC to aggregate user signups, track uploads, storage bytes, and moderation SLA statistics. Aggregation results are written atomically into snapshot documents keyed by date (YYYY-MM-DD), isolating analytics queries from live production transaction tables.",
+      "acceptanceCriteria": [
+        "Prisma model PlatformMetricSnapshot is created with snapshotDate (unique), totalUsers, newUsersToday, totalArtists, newArtistsToday, totalTracks, newTracksToday, audioBytesTotal, imageBytesTotal, pendingReportsCount, resolvedReportsToday, avgReportResolutionTimeMinutes, and UTC ISO-8601 createdAt.",
+        "Daily CRON API handler at /api/v1/cron/aggregate-metrics executes at 00:00 UTC and computes platform metrics across User, Track, ArtistProfile, and Report collections.",
+        "Aggregation execution is idempotent; re-running for an existing snapshotDate replaces the PlatformMetricSnapshot record atomically.",
+        "All timestamps inside the snapshot document use UTC ISO-8601 format.",
+        "Unit tests in services/analyticsAggregation.test.ts verify metric calculation logic and idempotency when handling existing snapshot dates.",
+        "Integration test in tests/api/cronAggregation.test.ts executes GET /api/v1/cron/aggregate-metrics with secret CRON auth header and verifies snapshot record persistence."
+      ],
+      "priority": 101,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-analytics-002",
+      "title": "Implement Admin Analytics Summary Metrics REST API Endpoint",
+      "description": "Implements the GET /api/v1/admin/analytics/summary endpoint to deliver real-time aggregate totals for signups, uploaded live tracks, and active artists alongside previous period comparisons and growth percentages. Access is strictly gated to users with the Admin role.",
+      "acceptanceCriteria": [
+        "GET /api/v1/admin/analytics/summary returns JSON matching AdminSummaryMetricsResponse containing totalSignups, uploadedTracks, and activeArtists metrics with 60-second caching.",
+        "Each metric object includes currentCount, previousPeriodCount, growthPercentage, and an overall asOfTimestamp formatted in UTC ISO-8601.",
+        "Server-side middleware verifies JWT token and Admin role claim; requests from Listener, Artist, or Guest roles return HTTP 403 Forbidden.",
+        "Access attempts are logged in security audit logs with user ID, source IP address, and request path.",
+        "Unit tests in services/analyticsSummary.test.ts verify growth percentage calculation algorithms including zero-division fallback edge cases.",
+        "Integration tests in tests/api/adminSummaryAnalytics.test.ts assert GET /api/v1/admin/analytics/summary returns 200 with valid data envelope for Admin tokens and 403 for non-admin tokens."
+      ],
+      "priority": 102,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-007"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-analytics-003",
+      "title": "Implement Admin Storage Utilization Metrics REST API Endpoint",
+      "description": "Implements the GET /api/v1/admin/analytics/storage endpoint to calculate and return aggregate storage consumption across audio files and cover/avatar image assets. Evaluates resource usage against the 500 GB soft quota threshold and calculates utilization percentages for capacity planning.",
+      "acceptanceCriteria": [
+        "GET /api/v1/admin/analytics/storage returns StorageMetricsResponse detailing totalStorageBytes, audioStorageBytes, imageStorageBytes, totalAudioFiles, totalImageFiles, softQuotaBytes, utilizationPercentage, and UTC ISO-8601 updatedAt.",
+        "audioStorageBytes sums fileSizeBytes of uploaded tracks; imageStorageBytes calculates total storage across Track cover images and ArtistProfile avatars.",
+        "Server-side Admin RBAC middleware enforces HTTP 403 Forbidden for non-admin request attempts.",
+        "Unit tests in services/storageMetrics.test.ts verify correct byte aggregation logic across tracks and image resources.",
+        "Integration test in tests/api/adminStorageAnalytics.test.ts asserts GET /api/v1/admin/analytics/storage returns 200 OK with expected JSON structure for authenticated Admin sessions."
+      ],
+      "priority": 103,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-007"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-analytics-004",
+      "title": "Implement Admin Time-Series Growth Analytics REST API Endpoint",
+      "description": "Implements the GET /api/v1/admin/analytics/time-series endpoint to serve historical signup and track upload trend data. Queries pre-aggregated PlatformMetricSnapshot documents over configurable historical windows (7d, 30d, 90d) and intervals (daily, weekly) for high-performance chart rendering.",
+      "acceptanceCriteria": [
+        "GET /api/v1/admin/analytics/time-series accepts metric (signups|uploads|all), window (7d|30d|90d, default 30d), and interval (daily|weekly, default daily) query parameters.",
+        "Response payload matches TimeSeriesMetricsResponse containing array of TimeSeriesDataPoint records (date YYYY-MM-DD, signupsCount, uploadsCount).",
+        "Data is retrieved directly from PlatformMetricSnapshot records to isolate analytical workloads from core OLTP collections.",
+        "Server-side Admin RBAC middleware rejects unauthorized or non-admin requests with HTTP 403 Forbidden.",
+        "Unit tests in services/timeSeriesAnalytics.test.ts verify interval grouping and date range query filter construction.",
+        "Integration tests in tests/api/adminTimeSeriesAnalytics.test.ts verify GET /api/v1/admin/analytics/time-series returns 200 with time-series data points spanning requested window."
+      ],
+      "priority": 104,
+      "passes": false,
+      "dependsOn": [
+        "STORY-analytics-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-analytics-005",
+      "title": "Implement Admin Moderation Queue Performance Metrics REST API Endpoint",
+      "description": "Implements the GET /api/v1/admin/analytics/moderation-stats endpoint to deliver moderation queue efficiency metrics. Tracks open pending reports, reports exceeding 36 hours (approaching the 48-hour DMCA SLA boundary), 24h/7d resolution volumes, average resolution time, and SLA compliance percentages.",
+      "acceptanceCriteria": [
+        "GET /api/v1/admin/analytics/moderation-stats returns ModerationStatsResponse containing openReportsCount, criticalPendingCount (age > 36h), resolved24hCount, resolved7dCount, avgResolutionTimeHours, slaTargetHours (48), and slaCompliancePercentage.",
+        "avgResolutionTimeHours is computed from elapsed time between Report.createdAt and Report.resolvedAt for reports resolved in trailing 30 days.",
+        "Server-side Admin RBAC middleware enforces HTTP 403 Forbidden for non-admin request attempts.",
+        "Unit tests in services/moderationAnalytics.test.ts verify average resolution time math and 36-hour SLA warning threshold calculation.",
+        "Integration tests in tests/api/adminModerationAnalytics.test.ts assert GET /api/v1/admin/analytics/moderation-stats returns 200 OK with accurate count metrics for Admin users."
+      ],
+      "priority": 105,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-007"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-analytics-006",
+      "title": "Implement Frontend Admin Analytics Dashboard View and Interactive Metric Cards",
+      "description": "Builds the client-side Admin Analytics & Metrics Dashboard UI at /admin/analytics using React, Tailwind CSS, and shadcn/ui. Displays top summary metric cards, a storage utilization progress bar with 75% warning and 90% critical visual alerts, interactive time-series growth charts, and a moderation SLA performance tracking panel.",
+      "acceptanceCriteria": [
+        "/admin/analytics page renders total signups, uploaded tracks, and active artist summary cards with real-time refresh controls and growth indicators.",
+        "Storage Utilization Tracker visualizes audio vs image byte breakdown and triggers warning visual states at 75% and critical alerts at 90% of soft quota.",
+        "Time-series chart component renders interactive signup and upload trend lines over 7d, 30d, and 90d selectable windows.",
+        "Moderation SLA panel displays open report backlog, critical pending count (> 36h SLA alert), and overall 48h SLA compliance gauge.",
+        "UI layout is responsive down to 375px viewports and satisfies WCAG 2.1 AA keyboard navigation and screen reader requirements.",
+        "Unit tests in components/admin/AnalyticsDashboard.test.tsx verify metric card formatting, quota alert thresholds, and chart rendering states.",
+        "Playwright spec in e2e/tests/admin-analytics.spec.ts verifies dashboard loading for Admin users, interactive time-series window switching, and 403 redirect state for non-admin users."
+      ],
+      "priority": 106,
+      "passes": false,
+      "dependsOn": [
+        "STORY-analytics-002",
+        "STORY-analytics-003",
+        "STORY-analytics-004",
+        "STORY-analytics-005"
+      ],
+      "notes": "",
+      "effort": "high",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-deploy-001",
+      "title": "Implement Server Health Check API Endpoint for Load Balancer Probes",
+      "description": "Implement the GET /api/v1/health REST API endpoint to serve as a liveness and readiness probe for AWS Application Load Balancers and ECS task health checks. The endpoint validates active MongoDB database connectivity via Prisma ORM before returning a healthy status payload.",
+      "acceptanceCriteria": [
+        "GET /api/v1/health returns HTTP 200 OK with body containing status, timestamp, uptime, and database connection state.",
+        "Timestamps in the health check payload are serialized in UTC ISO-8601 format.",
+        "Endpoint verifies MongoDB database connectivity via a Prisma query before returning healthy status.",
+        "Returns HTTP 503 Service Unavailable with error details if the database connection fails or times out.",
+        "Response headers explicitly include Cache-Control: no-store, must-revalidate to prevent CDN caching of health status.",
+        "Integration test calls GET /api/v1/health and asserts HTTP 200 status code and JSON schema validity."
+      ],
+      "priority": 107,
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-008"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-deploy-002",
+      "title": "Configure Multi-Stage Dockerfile and Standalone Next.js Build Optimization",
+      "description": "Configure next.config.js to enable standalone output mode and create a multi-stage Dockerfile targeting Node.js 20 LTS. Optimizes container footprints to under 150MB by including only necessary node_modules dependencies for server execution.",
+      "acceptanceCriteria": [
+        "next.config.js contains output: 'standalone' configuration for build optimization.",
+        "Multi-stage Dockerfile defines separate dependencies, build, and lightweight runner stages based on node:20-alpine.",
+        "Container runner stage executes under a non-root node user exposing port 3000.",
+        "Executing `docker build -t indie-stream-app .` completes with exit code 0 and yields an image under 150MB.",
+        "Containerized application starts cleanly and responds to GET /api/v1/health on port 3000.",
+        "Unit tests verify next.config.js exports valid configuration settings."
+      ],
+      "priority": 108,
+      "passes": false,
+      "dependsOn": [
+        "STORY-deploy-001"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-deploy-003",
+      "title": "Configure AWS S3 Bucket Security Policies, CORS Rules, and IAM Execution Templates",
+      "description": "Define Infrastructure-as-Code templates for S3 media buckets enforcing BlockPublicAccess, least-privilege IAM execution roles for PutObject/GetObject/DeleteObject actions, and CORS origin restrictions for client uploads and streaming.",
+      "acceptanceCriteria": [
+        "Bucket configuration template enforces BlockPublicAccess: true blocking all public access.",
+        "IAM execution policy limits PutObject, GetObject, and DeleteObject actions strictly to target S3 bucket ARNs.",
+        "CORS policy authorizes GET, PUT, and HEAD methods strictly from allowed application origins.",
+        "CORS rules expose ETag headers and set MaxAgeSeconds to 3600 for presigned upload caching.",
+        "Acceptance validation test verifies syntax and ARN scoping of IAM and CORS JSON policy definitions."
+      ],
+      "priority": 109,
+      "passes": false,
+      "dependsOn": [
+        "STORY-deploy-002"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-deploy-004",
+      "title": "Implement Response Header Caching Policies for Static Assets and API Endpoints",
+      "description": "Configure Next.js custom response headers and middleware to attach immutable long-term caching to static assets under /_next/static/*, daily caching to /public assets, and strict no-store headers to dynamic API routes.",
+      "acceptanceCriteria": [
+        "Static JavaScript and CSS bundles under /_next/static/* return Cache-Control: public, max-age=31536000, immutable.",
+        "Public image and static assets under /public/* return Cache-Control: public, max-age=86400, stale-while-revalidate=3600.",
+        "Dynamic application routes and API endpoints under /api/v1/* return Cache-Control: no-store, must-revalidate.",
+        "Integration tests make requests to static asset paths and API endpoints, verifying correct Cache-Control header values."
+      ],
+      "priority": 110,
+      "passes": false,
+      "dependsOn": [
+        "STORY-deploy-001"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-deploy-005",
+      "title": "Implement Automated Ephemeral Database Migration Task Runner Script",
+      "description": "Create an automated database migration script that runs `npx prisma db push` as an isolated pre-deployment task before container rollouts. Ensures zero-downtime MongoDB schema synchronization and index verification.",
+      "acceptanceCriteria": [
+        "Migration entrypoint script scripts/db-migrate.sh executes `npx prisma db push` using DATABASE_URL from environment.",
+        "Script logs schema synchronization progress and exits with code 0 on successful schema sync.",
+        "Script exits with a non-zero exit code if database connection fails or schema synchronization errors occur.",
+        "Script verifies MongoDB collection index creation for User, Track, and AuditLog models.",
+        "Integration test executes scripts/db-migrate.sh against a test MongoDB instance and asserts clean exit code 0."
+      ],
+      "priority": 111,
+      "passes": false,
+      "dependsOn": [
+        "STORY-deploy-002"
+      ],
+      "notes": "",
+      "effort": "low",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-deploy-006",
+      "title": "Implement GitHub Actions CI/CD Pipeline Workflow for Automated Lint, Test, and ECS Deployment",
+      "description": "Create the GitHub Actions workflow in .github/workflows/deploy.yml orchestrating sequential quality gates: ESLint and TypeScript checks, unit test execution with 80% coverage enforcement, multi-stage Docker build, Prisma DB migration, and ECS Fargate rolling deployment.",
+      "acceptanceCriteria": [
+        ".github/workflows/deploy.yml triggers on pull requests to main and commits merged into main.",
+        "Job `lint-and-typecheck` runs `npm run lint && npx tsc --noEmit` and fails build on warnings or errors.",
+        "Job `unit-tests` executes `npm run test -- --coverage` and enforces a minimum 80% code coverage threshold.",
+        "Job `docker-build` builds the standalone container image and pushes to Amazon ECR upon successful tests on main branch.",
+        "Job `db-migrate` triggers the ephemeral database migration script prior to triggering service deployment.",
+        "Job `ecs-deploy` initiates ECS rolling update and monitors health via GET /api/v1/health over a 180-second evaluation window.",
+        "Workflow YAML file syntax is validated clean against GitHub Actions schema guidelines."
+      ],
+      "priority": 112,
+      "passes": false,
+      "dependsOn": [
+        "STORY-deploy-005"
+      ],
+      "notes": "",
+      "effort": "medium",
+      "model": "deepseek"
+    }
+  ]
+}

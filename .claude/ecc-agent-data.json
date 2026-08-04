@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json.schemastore.org/json",
+  "description": "ECC agent data root for Ralph build workspace. Hooks and memory persist here per build.",
+  "agentDataHome": "/home/nitin-sharma/ralph-workspaces/e29dbeb9-bd50-43bd-b208-68007e42ec25/1f096f0a-73e7-4dbb-b1e9-ac762bb210e5/.claude/ecc-data"
+}
