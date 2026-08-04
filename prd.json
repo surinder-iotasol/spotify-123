@@ -282,7 +282,7 @@
       ],
       "priority": 4.2,
       "effort": "medium",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-005a"
       ],
