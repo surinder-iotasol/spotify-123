@@ -659,13 +659,47 @@
         "Unit tests in tests/unit/security/password.test.ts verify hashing, cost factor 12 execution time (~250ms), verification logic, and payload sanitization."
       ],
       "priority": 10,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-004"
+      ],
+      "notes": "auto-split into 2 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-001a",
+      "title": "Create User payload sanitization utility",
+      "description": "Build a sanitizeUser function that strips passwordHash from User model objects for safe JSON serialization. Also create sanitizeUserArray for arrays of users.",
+      "acceptanceCriteria": [
+        "sanitizeUser removes passwordHash and password_hash fields from a single User object, preserving all other fields.",
+        "sanitizeUserArray applies sanitization to each element in a user array and returns a new array.",
+        "Unit tests verify that passwordHash is stripped while all other fields pass through unchanged."
+      ],
+      "priority": 10.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-004"
       ],
-      "notes": "",
-      "effort": "medium",
-      "model": "deepseek"
+      "notes": ""
+    },
+    {
+      "id": "STORY-security-001b",
+      "title": "Add Prisma User select wrapper to omit passwordHash",
+      "description": "Create a Prisma select wrapper constant that excludes passwordHash from User queries by default to prevent accidental leakage.",
+      "acceptanceCriteria": [
+        "Export a USER_SELECT_OMIT_PASSWORD constant that omits passwordHash while selecting all other User fields.",
+        "Users can apply the select wrapper in Prisma queries to prevent passwordHash from appearing in results.",
+        "Unit test verifies the select wrapper shape includes all User fields except passwordHash."
+      ],
+      "priority": 10.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-001a"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-security-002",
