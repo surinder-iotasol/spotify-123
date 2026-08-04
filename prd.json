@@ -13,11 +13,70 @@
         "Root `package.json` initializes project name as `spotify` with private package status."
       ],
       "priority": 0,
+      "passes": true,
+      "dependsOn": [],
+      "notes": "auto-split into 4 sub-stories",
+      "effort": "small",
+      "model": "haiku"
+    },
+    {
+      "id": "STORY-setup-001a",
+      "title": "Create root package.json for spotify project",
+      "description": "Initialize project-level package.json with name spotify, private status, and work. Defines the foundational project metadata for subsequent scaffolding stories.",
+      "acceptanceCriteria": [
+        "Root package.json exists with name field set to spotify.",
+        "Package marked as private with no version or main fields required."
+      ],
+      "priority": 0.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [],
-      "notes": "",
+      "notes": "Git already initialized in prior commit fd80601."
+    },
+    {
+      "id": "STORY-setup-001b",
+      "title": "Create comprehensive .gitignore for Node and Next.js",
+      "description": "Add .gitignore covering node_modules, .next build output, .env files, IDE configs, and OS artifacts. Prevents committing sensitive or build files.",
+      "acceptanceCriteria": [
+        ".gitignore exists and covers node_modules, .next, .env, and build artifacts."
+      ],
+      "priority": 0.2,
       "effort": "low",
-      "model": "haiku"
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-001a"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-001c",
+      "title": "Create .editorconfig with formatting specifications",
+      "description": "Add .editorconfig specifying 2-space indentation, UTF-8 encoding, and LF line endings. Ensures consistent editor behavior across the team.",
+      "acceptanceCriteria": [
+        ".editorconfig exists with 2-space indentation, UTF-8 encoding, and LF line endings."
+      ],
+      "priority": 0.30000000000000004,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-001b"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-001d",
+      "title": "Create README.md documenting project setup",
+      "description": "Add README.md documenting repository layout, setup prerequisites, and development scripts. Provides onboarding guidance for new contributors.",
+      "acceptanceCriteria": [
+        "README.md exists with repository layout, setup prerequisites, and development scripts documented."
+      ],
+      "priority": 0.4,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-001c"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-setup-002",
@@ -36,7 +95,7 @@
         "STORY-setup-001"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "haiku"
     },
     {
@@ -56,7 +115,7 @@
         "STORY-setup-002"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -156,7 +215,7 @@
         "STORY-setup-007"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -196,7 +255,7 @@
         "STORY-setup-009"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -475,7 +534,7 @@
         "STORY-security-001"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -652,7 +711,7 @@
         "STORY-security-005"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -804,7 +863,7 @@
         "STORY-profile-004"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -958,7 +1017,7 @@
         "STORY-track-003"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -1050,7 +1109,7 @@
         "STORY-storage-001"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -1252,7 +1311,7 @@
         "STORY-player-003"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "haiku"
     },
     {
@@ -1298,7 +1357,7 @@
         "STORY-player-003"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "haiku"
     },
     {
@@ -1519,7 +1578,7 @@
         "STORY-playlist-002"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -1602,7 +1661,7 @@
         "STORY-setup-004"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -2364,7 +2423,7 @@
         "STORY-setup-008"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -2405,7 +2464,7 @@
         "STORY-deploy-002"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -2424,7 +2483,7 @@
         "STORY-deploy-001"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
@@ -2444,7 +2503,7 @@
         "STORY-deploy-002"
       ],
       "notes": "",
-      "effort": "low",
+      "effort": "small",
       "model": "deepseek"
     },
     {
