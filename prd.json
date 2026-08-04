@@ -212,7 +212,7 @@
       ],
       "priority": 3.1,
       "effort": "low",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-003"
       ],
@@ -228,7 +228,7 @@
       ],
       "priority": 3.2,
       "effort": "low",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-004a"
       ],
@@ -246,13 +246,64 @@
         "Integration test validates audio upload size constraint validation helper caps files at 50MB."
       ],
       "priority": 4,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-004"
+      ],
+      "notes": "auto-split into 3 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-005a",
+      "title": "Define StorageService interface and types",
+      "description": "Define the vendor-agnostic StorageService interface with uploadObject, deleteObject, and generateSignedUrl method signatures in src/lib/storage/storage.service.ts.",
+      "acceptanceCriteria": [
+        "StorageService interface defined with uploadObject, deleteObject, generateSignedUrl method signatures.",
+        "TypeScript types exported for StorageConfig, UploadParams, and PresignedUrlResult.",
+        "src/lib/storage/storage.service.ts file scaffolded with interface definition only."
+      ],
+      "priority": 4.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-004"
       ],
-      "notes": "",
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-005b",
+      "title": "Implement S3StorageService with presigned URLs",
+      "description": "Implement S3StorageService wrapping @aws-sdk/client-s3 with upload, delete, and presigned URL methods for putObject and getObject.",
+      "acceptanceCriteria": [
+        "S3StorageService implements StorageService interface using @aws-sdk/client-s3.",
+        "generateSignedUrl produces 60-minute presigned PUT URLs for uploads.",
+        "generateSignedUrl enforces 3600-second TTL cap for getObject streaming delivery URLs."
+      ],
+      "priority": 4.2,
       "effort": "medium",
-      "model": "deepseek"
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-005a"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-005c",
+      "title": "Add upload size validation helper utility",
+      "description": "Create a utility helper that validates audio upload size constraints capping files at 50MB.",
+      "acceptanceCriteria": [
+        "src/lib/storage/upload-validation.ts exports validateAudioFileSize function.",
+        "Function returns true when file size is at or below 50MB threshold.",
+        "Unit test verifies 50MB cap enforcement with valid and invalid sizes."
+      ],
+      "priority": 4.3,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-005b"
+      ],
+      "notes": "Validation helper consumed by S3 service for upload size enforcement."
     },
     {
       "id": "STORY-setup-006",
