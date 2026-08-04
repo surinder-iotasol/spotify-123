@@ -1,0 +1,251 @@
+// Ralph Music Platform — Prisma schema
+// MongoDB provider with 9 canonical models, 7 enums, compound indexes.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  LISTENER
+  ARTIST
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum TrackStatus {
+  DRAFT
+  LIVE
+  ARCHIVED
+}
+
+enum Genre {
+  INDIE_ROCK
+  BEDROOM_POP
+  ELECTRONIC
+  HIP_HOP
+  LO_FI
+  AMBIENT
+  R_AND_B
+  FOLK
+  OTHER
+}
+
+enum ReportReason {
+  SPAM
+  COPYRIGHT
+  HARASSMENT
+  MISLEADING
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum AuditAction {
+  USER_CREATE
+  USER_UPDATE
+  USER_DELETE
+  TRACK_CREATE
+  TRACK_UPDATE
+  TRACK_DELETE
+  PLAYLIST_CREATE
+  PLAYLIST_UPDATE
+  PLAYLIST_DELETE
+  REPORT_CREATE
+  REPORT_RESOLVE
+  ARTIST_PROFILE_UPDATE
+}
+
+// ── Models ─────────────────────────────────────────────────────────────────
+
+model User {
+  id              String        @id @map("_id")
+  email           String        @unique
+  passwordHash    String        @map("password_hash")
+  name            String?
+  displayName     String?       @map("display_name")
+  avatarUrl       String?       @map("avatar_url")
+  roles           UserRole[]
+  role            UserRole      @default(LISTENER)
+  status          AccountStatus @default(ACTIVE)
+  emailVerified   Boolean       @default(false) @map("email_verified")
+  emailVerifiedAt DateTime?     @map("email_verified_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  deletedAt       DateTime?     @map("deleted_at")
+
+  artistProfile ArtistProfile?
+  playlists     Playlist[]
+  likes         Like[]
+  follows       Follow[]
+  reportsSent   Report[] @relation("ReportsSent")
+  reportsTarget Report[] @relation("ReportsTarget")
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model ArtistProfile {
+  id             String   @id @map("_id")
+  userId         String   @unique @map("user_id")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stageName      String   @map("stage_name")
+  bio            String?
+  avatarUrl      String?  @map("avatar_url")
+  headerImageUrl String?  @map("header_image_url")
+  genreTags      Genre[]
+  socialLinks    String[] @map("social_links")
+  isVerified     Boolean  @default(false) @map("is_verified")
+  followerCount  Int      @default(0) @map("follower_count")
+  trackCount     Int      @default(0) @map("track_count")
+  totalPlays     Int      @default(0)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  tracks    Track[]
+  followers Follow[]
+
+  @@map("artist_profiles")
+}
+
+model Track {
+  id              String        @id @map("_id")
+  title           String
+  description     String?
+  audioUrl        String        @map("audio_url")
+  audioStorageKey String        @map("audio_storage_key")
+  coverImageUrl   String?       @map("cover_image_url")
+  duration        Float
+  genre           Genre
+  status          TrackStatus   @default(DRAFT)
+  playCount       Int           @default(0)
+  likeCount       Int           @default(0)
+  artistProfileId String        @map("artist_profile_id")
+  artistProfile   ArtistProfile @relation(fields: [artistProfileId], references: [id], onDelete: Cascade)
+  playlistTracks  PlaylistTrack[]
+  likes           Like[]
+  reports         Report[]
+  userId          String?       @map("user_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  deletedAt       DateTime?     @map("deleted_at")
+
+  @@index([artistProfileId])
+  @@index([genre, status])
+  @@index([createdAt])
+  @@map("tracks")
+}
+
+model Playlist {
+  id          String    @id @map("_id")
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  coverImageUrl String? @map("cover_image_url")
+  isPublic    Boolean   @default(true) @map("is_public")
+  trackCount  Int       @default(0) @map("track_count")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  tracks    PlaylistTrack[]
+  followers Follow[]
+
+  @@index([userId])
+  @@map("playlists")
+}
+
+model PlaylistTrack {
+  id         String   @id @map("_id")
+  playlistId String   @map("playlist_id")
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  trackId    String   @map("track_id")
+  track      Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  position   Int
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([playlistId, position])
+  @@unique([playlistId, trackId])
+  @@map("playlist_tracks")
+}
+
+model Like {
+  id        String   @id @map("_id")
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trackId   String   @map("track_id")
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, trackId])
+  @@map("likes")
+}
+
+model Follow {
+  id              String   @id @map("_id")
+  followerId      String   @map("follower_id")
+  artistProfileId String?  @map("artist_profile_id")
+  playlistId      String?  @map("playlist_id")
+  artistProfile   ArtistProfile? @relation(fields: [artistProfileId], references: [id], onDelete: Cascade)
+  playlist        Playlist?    @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  follower        User         @relation(fields: [followerId], references: [id], onDelete: Cascade)
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  @@unique([followerId, artistProfileId])
+  @@unique([followerId, playlistId])
+  @@map("follows")
+}
+
+model Report {
+  id            String         @id @map("_id")
+  reporterId    String         @map("reporter_id")
+  reporter      User           @relation("ReportsSent", fields: [reporterId], references: [id])
+  targetUserId  String?        @map("target_user_id")
+  targetUser    User?          @relation("ReportsTarget", fields: [targetUserId], references: [id])
+  trackId       String?        @map("track_id")
+  track         Track?         @relation(fields: [trackId], references: [id])
+  reason        ReportReason
+  status        ReportStatus   @default(PENDING)
+  description   String?
+  reviewedBy    String?        @map("reviewed_by")
+  reviewedAt    DateTime?      @map("reviewed_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  @@index([reporterId])
+  @@index([status])
+  @@map("reports")
+}
+
+model AuditLog {
+  id        String       @id @map("_id")
+  action    AuditAction
+  entity    String
+  entityId  String       @map("entity_id")
+  userId    String?      @map("user_id")
+  user      User?        @relation(fields: [userId], references: [id])
+  changes   String?
+  ipAddress String?      @map("ip_address")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
