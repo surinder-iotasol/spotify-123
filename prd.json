@@ -732,7 +732,7 @@
       ],
       "priority": 11.1,
       "effort": "low",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-007"
       ],
