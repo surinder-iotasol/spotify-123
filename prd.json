@@ -194,13 +194,45 @@
         "Unit test instantiates PrismaClient and validates all model typings compile without TypeScript errors."
       ],
       "priority": 3,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-003"
+      ],
+      "notes": "auto-split into 2 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-004a",
+      "title": "Verify Prisma schema validates and generates",
+      "description": "Run prisma validate and prisma generate to confirm schema is correct and type-safe SDK is produced without errors.",
+      "acceptanceCriteria": [
+        "npx prisma validate reports no errors on the existing prisma/schema.prisma.",
+        "npx prisma generate outputs a type-safe PrismaClient SDK successfully."
+      ],
+      "priority": 3.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-003"
       ],
-      "notes": "",
-      "effort": "medium",
-      "model": "deepseek"
+      "notes": "Schema already exists with all 9 models, 7 enums, and compound indexes. This story is purely verification."
+    },
+    {
+      "id": "STORY-setup-004b",
+      "title": "Create PrismaClient unit test",
+      "description": "Write a unit test that instantiates PrismaClient and validates all model typings compile without TypeScript errors.",
+      "acceptanceCriteria": [
+        "Test file imports and instantiates PrismaClient from @prisma/client.",
+        "All 9 model types (User, ArtistProfile, Track, Playlist, PlaylistTrack, Like, Follow, Report, AuditLog) compile without TypeScript errors."
+      ],
+      "priority": 3.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-004a"
+      ],
+      "notes": "Schema and prisma client already exist. Story only adds the unit test."
     },
     {
       "id": "STORY-setup-005",
