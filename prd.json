@@ -423,13 +423,47 @@
         "Integration tests verify JWT session extraction from HTTP-only cookies and RBAC route protection for Listener vs Admin roles."
       ],
       "priority": 6,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-006"
+      ],
+      "notes": "auto-split into 2 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-007a",
+      "title": "Implement Next.js admin RBAC middleware",
+      "description": "Create src/middleware.ts that intercepts /admin/* and /api/v1/admin/* routes. Extract session cookie, verify JWT, and enforce ADMIN role. Return 401 for unauthenticated and 403 for non-admin users.",
+      "acceptanceCriteria": [
+        "src/middleware.ts intercepts /admin/* and /api/v1/admin/* routes using Next.js route matchers.",
+        "Middleware extracts the session JWT from HTTP-only cookies, verifies it, and checks the role claim is ADMIN.",
+        "Unauthenticated requests return HTTP 401 UNAUTHENTICATED; non-admin requests return HTTP 403 FORBIDDEN_INSUFFICIENT_ROLE."
+      ],
+      "priority": 6.1,
+      "effort": "medium",
       "passes": false,
       "dependsOn": [
         "STORY-setup-006"
       ],
-      "notes": "",
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-007b",
+      "title": "Add integration tests for JWT auth and RBAC",
+      "description": "Write integration tests that verify JWT session extraction from HTTP-only cookies and RBAC route protection distinguishing Listener vs Admin roles on admin routes.",
+      "acceptanceCriteria": [
+        "Integration tests verify JWT session extraction from HTTP-only cookies for authenticated requests.",
+        "Tests confirm non-admin roles are rejected with 403 on /api/v1/admin/* and /admin/* paths.",
+        "Tests confirm unauthenticated requests receive 401 responses on protected admin routes."
+      ],
+      "priority": 6.2,
       "effort": "medium",
-      "model": "deepseek"
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-007a"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-setup-008",
