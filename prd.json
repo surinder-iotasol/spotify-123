@@ -317,13 +317,99 @@
         "Integration tests cover `apiSuccessResponse`, `apiErrorResponse`, and Zod validation failure scenarios for HTTP status codes 400, 422, and 500."
       ],
       "priority": 5,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-005"
+      ],
+      "notes": "auto-split into 5 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-006a",
+      "title": "Implement API response helpers and types",
+      "description": "Implement apiSuccessResponse and apiErrorResponse envelope builders with sensitive field sanitization, UTC timestamps, and request ID tracing.",
+      "acceptanceCriteria": [
+        "apiSuccessResponse constructs payload with success true, data, UTC timestamp, and requestId.",
+        "apiErrorResponse constructs payload with success false, error code, message, and optional details array.",
+        "Sensitive fields like passwords and tokens are redacted from both success and error payloads."
+      ],
+      "priority": 5.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-005"
       ],
-      "notes": "",
-      "effort": "medium",
-      "model": "deepseek"
+      "notes": "Covers src/lib/api/response.ts only. Types: ApiSuccessResponse, ApiErrorResponse, ValidationErrorDetail."
+    },
+    {
+      "id": "STORY-setup-006b",
+      "title": "Implement Zod validation middleware",
+      "description": "Implement validateBody(schema) middleware that validates Zod schemas and throws ValidationError with 422 status and structured detail entries.",
+      "acceptanceCriteria": [
+        "validateBody(schema) returns a function that resolves with parsed data on success.",
+        "Validation failure throws ValidationError with statusCode 422 and ValidationErrorDetail entries.",
+        "Nested field paths are formatted as dot-separated strings prefixed with body."
+      ],
+      "priority": 5.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006a"
+      ],
+      "notes": "Covers src/lib/api/validation.ts. Depends on ValidationErrorDetail type from response.ts."
+    },
+    {
+      "id": "STORY-setup-006c",
+      "title": "Add unit tests for response helpers",
+      "description": "Write unit tests covering apiSuccessResponse, apiErrorResponse, sensitive field sanitization, request ID resolution, and metadata inclusion.",
+      "acceptanceCriteria": [
+        "Tests verify success envelope fields and optional meta object.",
+        "Tests verify error envelope structure, details array, and requestId behavior.",
+        "Tests verify nested and array payload sanitization does not mutate originals."
+      ],
+      "priority": 5.3,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006a"
+      ],
+      "notes": "Covers src/lib/api/response.test.ts."
+    },
+    {
+      "id": "STORY-setup-006d",
+      "title": "Add unit tests for validation middleware",
+      "description": "Write unit tests for validateBody covering success parsing, failure with 422 ValidationError, nested field paths, and custom error messages.",
+      "acceptanceCriteria": [
+        "Tests verify valid payloads resolve with parsed data including optional fields.",
+        "Tests verify missing required fields and invalid types throw ValidationError with 422 status.",
+        "Tests verify nested dot-separated field paths and custom error messages in details."
+      ],
+      "priority": 5.4,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006b"
+      ],
+      "notes": "Covers src/lib/api/validation.test.ts."
+    },
+    {
+      "id": "STORY-setup-006e",
+      "title": "Add integration tests for API pipeline",
+      "description": "Write integration tests simulating route handlers that exercise the full response and validation pipeline across HTTP 400, 422, and 500 status codes.",
+      "acceptanceCriteria": [
+        "Tests simulate 400 bad request returning structured error envelope.",
+        "Tests simulate 422 validation failures with proper detail arrays and request IDs.",
+        "Tests simulate 500 internal errors and verify no password leakage in any response."
+      ],
+      "priority": 5.5,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-006c",
+        "STORY-setup-006d"
+      ],
+      "notes": "Covers src/lib/api/integration.test.ts. Depends on both response and validation tests being solid."
     },
     {
       "id": "STORY-setup-007",
