@@ -29,7 +29,7 @@
       ],
       "priority": 0.1,
       "effort": "low",
-      "passes": false,
+      "passes": true,
       "dependsOn": [],
       "notes": "Git already initialized in prior commit fd80601."
     },
