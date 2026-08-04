@@ -90,7 +90,7 @@
         "Running `npm run dev` boots Next.js development server on `http://localhost:3000` without runtime errors."
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-001"
       ],
