@@ -353,7 +353,7 @@
       ],
       "priority": 5.2,
       "effort": "low",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-006a"
       ],
