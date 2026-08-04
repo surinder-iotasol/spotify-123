@@ -1,0 +1,142 @@
+Ralph Summary - Wed Aug  5 07:51:35 AM AEST 2026
+Mode: fresh-context | Context: 200K (default) | Effort: medium | Cost: ~$0.30
+Iterations: 3 | Stories: 29/137 | Runtime: 0h 5m
+Models: Opus=3 Sonnet=0 Haiku=0 | Quota pauses: 0 (0m)
+Auto-splits: 1 | Smart saves: 0 | Idle kills: 0
+[done] STORY-setup-001: Initialize repository workspace git config and project root files
+[done] STORY-setup-001a: Create root package.json for spotify project
+[done] STORY-setup-001b: Create comprehensive .gitignore for Node and Next.js
+[done] STORY-setup-001c: Create .editorconfig with formatting specifications
+[done] STORY-setup-001d: Create README.md documenting project setup
+[done] STORY-setup-002: Scaffold Next.js 14 fullstack monolith project baseline
+[done] STORY-setup-003: Install core dependencies and configure Tailwind CSS with shadcn UI
+[done] STORY-setup-003a: Add Tailwind CSS and PostCSS configuration
+[done] STORY-setup-003b: Configure globals.css with dark-first HSL tokens
+[done] STORY-setup-003c: Create shadcn/ui components.json configuration
+[done] STORY-setup-003d: Create cn() utility function and unit test
+[done] STORY-setup-004: Implement MongoDB database schema and Prisma ORM models
+[done] STORY-setup-004a: Verify Prisma schema validates and generates
+[done] STORY-setup-004b: Create PrismaClient unit test
+[done] STORY-setup-005: Implement StorageService interface abstraction for S3 signed URLs
+[done] STORY-setup-005a: Define StorageService interface and types
+[done] STORY-setup-005b: Implement S3StorageService with presigned URLs
+[done] STORY-setup-005c: Add upload size validation helper utility
+[done] STORY-setup-006: Implement standardized REST API response wrappers and validation middleware
+[done] STORY-setup-006a: Implement API response helpers and types
+[done] STORY-setup-006b: Implement Zod validation middleware
+[done] STORY-setup-006c: Add unit tests for response helpers
+[done] STORY-setup-006d: Add unit tests for validation middleware
+[done] STORY-setup-006e: Add integration tests for API pipeline
+[done] STORY-setup-007: Implement JWT authentication middleware and admin RBAC route guards
+[done] STORY-setup-007a: Implement Next.js admin RBAC middleware
+[done] STORY-setup-007b: Add integration tests for JWT auth and RBAC
+[done] STORY-setup-008: Implement limit-offset pagination contracts and response helpers
+[done] STORY-setup-009: Configure Vitest unit integration test runner and Playwright E2E setup
+[todo] STORY-setup-009a: Verify Vitest config with testing-library and Node environment
+[todo] STORY-setup-009b: Verify Playwright config with desktop and mobile viewports
+[todo] STORY-setup-009c: Run and verify all sample tests pass
+[todo] STORY-setup-009d: Commit test runner configuration and package scripts
+[todo] STORY-setup-010: Configure environment variable schema template and GitHub Actions CI workflow
+[todo] STORY-security-001: Implement Bcrypt Password Hashing and Payload Sanitization Utility
+[todo] STORY-security-002: Implement Session JWT Token Service and Secure Cookie Serialization
+[todo] STORY-security-003: Implement Next.js Edge Middleware for Server-Side Route Guarding
+[todo] STORY-security-004: Implement Resource Ownership Verification Helpers and IDOR Protection
+[todo] STORY-security-005: Implement Higher-Order withAuth and withRole API Handler Wrappers
+[todo] STORY-storage-001: Implement Unified StorageProvider Interface for S3 and Cloudflare R2
+[todo] STORY-storage-002: Implement Upload Intent API Endpoint with Media Validation
+[todo] STORY-storage-003: Implement Presigned Playback Stream URL Endpoint and Byte Range Headers
+[todo] STORY-storage-004: Implement Frontend Direct-to-Storage Upload Hook and Upload Component
+[todo] STORY-auth-001: Implement User Registration API Endpoint and Payload Validation
+[todo] STORY-auth-002: Implement User Login API Endpoint with Rate Limiting
+[todo] STORY-auth-003: Implement Password Reset and Credential Management APIs
+[todo] STORY-auth-004: Implement Log Sanitization and Password Field Protection Middleware
+[todo] STORY-auth-005: Implement Guest Session Migration Service
+[todo] STORY-auth-006: Implement Frontend Account Registration Page and Interactive Form
+[todo] STORY-auth-007: Implement Frontend Login Page and Form Component
+[todo] STORY-auth-008: Implement Frontend Password Recovery Pages
+[todo] STORY-role-001: Implement Listener to Artist Role Upgrade API Endpoint
+[todo] STORY-role-002: Implement Verification Email Generation and Dispatch Service
+[todo] STORY-role-003: Implement Email Verification Token Confirmation and Status APIs
+[todo] STORY-role-004: Implement Email Verification Gating Middleware for Track Uploads
+[todo] STORY-role-005: Implement Frontend Artist Upgrade Form and Settings Section
+[todo] STORY-role-006: Implement Frontend Email Verification Confirmation Page and Notification Banner
+[todo] STORY-profile-001: Implement Get Public Artist Profile API with Aggregated Metrics
+[todo] STORY-profile-002: Implement Update Artist Profile API Endpoint and Payload Validation
+[todo] STORY-profile-003: Implement Avatar and Header Image Upload Endpoints for Artist Profiles
+[todo] STORY-profile-004: Implement Listener Public Profile API Endpoint
+[todo] STORY-profile-005: Implement Account Suspension and Banned Status Profile Isolation Filter
+[todo] STORY-profile-006: Implement Frontend Public Artist Profile Page and Discography View
+[todo] STORY-profile-007: Implement Frontend Artist Profile Management and Image Upload Dashboard
+[todo] STORY-profile-008: Implement Frontend Public Listener Profile Page
+[todo] STORY-track-001: Implement Track Upload Intent API Endpoint with Presigned URL Generation
+[todo] STORY-track-002: Implement Server-Side Audio Metadata Extraction and Binary Header Inspection Service
+[todo] STORY-track-003: Implement Track Registration API Endpoint with Auto-Live Status and Cover Image Linking
+[todo] STORY-track-004: Implement Genre Tagging Validation and Search Indexing Trigger Service
+[todo] STORY-track-005: Implement Storage Cleanup and Error Recovery Handlers for Upload Failures
+[todo] STORY-track-006: Implement Frontend Track Upload Page and Interactive Multi-Step Upload Form
+[todo] STORY-track-007: Implement Track Metadata Update API Endpoint and Payload Validation
+[todo] STORY-track-008: Implement Asynchronous Storage Cleanup for Replaced Track Cover Art
+[todo] STORY-track-009: Implement Track Soft Archival Deletion Endpoint and Stream Interceptor
+[todo] STORY-track-010: Implement Synchronous Playlist Cascade Cleanup and Catalog Counter Sync
+[todo] STORY-track-011: Implement Asynchronous Storage Media Asset Purging Pipeline for Archived Tracks
+[todo] STORY-track-012: Implement Frontend Artist Catalog Management Page and Track Edit Form
+[todo] STORY-track-013: Implement Frontend Track Deletion Dialog and Active Player Queue Synchronization
+[todo] STORY-player-001: Implement Audio Player React Context and Session Persistence Provider
+[todo] STORY-player-002: Implement Audio Player Queue State Engine and Shuffling Actions
+[todo] STORY-player-003: Implement Persistent Bottom Audio Player Bar UI Component
+[todo] STORY-player-004: Implement Slide-Out Queue Drawer Overlay Component
+[todo] STORY-player-005: Implement MediaSession API Integration and Platform Keyboard Shortcuts
+[todo] STORY-player-006: Implement Unauthenticated Guest Playback and Auth Prompt Interceptor
+[todo] STORY-listen-001: Implement Play Session Initialization API Endpoint
+[todo] STORY-listen-002: Implement Play Beacon API Endpoint and Deduplication Verification Engine
+[todo] STORY-listen-003: Implement Real-Time Track Increment and Async Artist Play Counter Worker
+[todo] STORY-listen-004: Implement Client-Side Listen Threshold Beacon Dispatcher Hook
+[todo] STORY-playlist-001: Implement Playlist Creation API Endpoint and Owner Initialization
+[todo] STORY-playlist-002: Implement Playlist Ownership Authorization Helper and Metadata Update Endpoints
+[todo] STORY-playlist-003: Implement Playlist Track Addition and Removal API Endpoints
+[todo] STORY-playlist-004: Implement Playlist Track Reordering API Endpoint with Transactional Shifting
+[todo] STORY-playlist-005: Implement Frontend Interactive Playlist Management and Drag-and-Drop Editor Page
+[todo] STORY-playlist-006: Implement Playlist Visibility Toggle API Endpoint and Share URL Generator
+[todo] STORY-playlist-007: Implement Public and Private Playlist Detail API Endpoint with Access Controls
+[todo] STORY-playlist-008: Implement Dynamic OpenGraph Metadata Generator and Composite Social Image Endpoint
+[todo] STORY-playlist-009: Implement Frontend Public Playlist View Page and Guest Streaming Integration
+[todo] STORY-search-001: Configure MongoDB Compound Text Indexes and Search Optimization Indexes
+[todo] STORY-search-002: Implement Global Search API Endpoint with Parallel Multi-Entity Query Execution
+[todo] STORY-search-003: Implement Client Search Bar Component with Debounced Input and Auto-Suggestions
+[todo] STORY-search-004: Implement Frontend Global Search Results Page with Tabbed Filtering and Sorting
+[todo] STORY-like-001: Implement Track Like and Unlike API Endpoints with Atomic Counter Aggregation
+[todo] STORY-like-002: Implement User Liked Tracks Collection API Endpoint
+[todo] STORY-like-003: Implement Session-Based Track Like State Hydration in Track List API Handlers
+[todo] STORY-like-004: Implement Frontend Track Like Heart Button Component with Optimistic UI State
+[todo] STORY-like-005: Implement Frontend Liked Tracks Library Page with Queue Playback Integration
+[todo] STORY-follow-001: Implement Follow and Unfollow Artist API Endpoints with Atomic Metric Aggregation
+[todo] STORY-follow-002: Implement Follow Status Verification Endpoint and Follower Count Reconciliation Cron Job
+[todo] STORY-follow-003: Implement Personalized Activity Feed API Endpoint with Keyset Pagination
+[todo] STORY-follow-004: Implement Frontend Artist Follow Button Component with Optimistic UI and Toast Rollback
+[todo] STORY-follow-005: Implement Frontend Activity Feed Page Layout, Track Cards, and Empty States
+[todo] STORY-recommend-001: Implement User Genre Affinity Vector and Candidate Overlap Scoring Engine
+[todo] STORY-recommend-002: Implement Played Track Exclusion and Multi-Tiered Artist Diversity Interleaving Engine
+[todo] STORY-recommend-003: Implement Recommendation Cold-Start Fallback Strategy Engine for Guest and New Users
+[todo] STORY-recommend-004: Implement Recommendation Feed REST API Endpoint with Query Optimization
+[todo] STORY-recommend-005: Implement Frontend Recommended Music Discovery View and Genre Filter Component
+[todo] STORY-report-001: Implement Track Report Submission API Endpoint with Rate Limiting
+[todo] STORY-report-002: Implement Frontend Track Report Modal and Feedback Component
+[todo] STORY-moderation-001: Implement Admin Moderation Queue REST API Endpoint
+[todo] STORY-moderation-002: Implement Admin Content Takedown and Report Dismissal APIs
+[todo] STORY-moderation-003: Implement Frontend Admin Moderation Queue Dashboard
+[todo] STORY-usermod-001: Implement Admin User Management List API Endpoint
+[todo] STORY-usermod-002: Implement Admin User Status Mutation API and Session Revocation
+[todo] STORY-usermod-003: Implement Content Soft-Hide and Reinstatement Engine for Moderated Accounts
+[todo] STORY-usermod-004: Implement Frontend Admin User Moderation Management Dashboard
+[todo] STORY-analytics-001: Implement Daily Platform Statistics Aggregation Cron Job and Metric Snapshot Model
+[todo] STORY-analytics-002: Implement Admin Analytics Summary Metrics REST API Endpoint
+[todo] STORY-analytics-003: Implement Admin Storage Utilization Metrics REST API Endpoint
+[todo] STORY-analytics-004: Implement Admin Time-Series Growth Analytics REST API Endpoint
+[todo] STORY-analytics-005: Implement Admin Moderation Queue Performance Metrics REST API Endpoint
+[todo] STORY-analytics-006: Implement Frontend Admin Analytics Dashboard View and Interactive Metric Cards
+[todo] STORY-deploy-001: Implement Server Health Check API Endpoint for Load Balancer Probes
+[todo] STORY-deploy-002: Configure Multi-Stage Dockerfile and Standalone Next.js Build Optimization
+[todo] STORY-deploy-003: Configure AWS S3 Bucket Security Policies, CORS Rules, and IAM Execution Templates
+[todo] STORY-deploy-004: Implement Response Header Caching Policies for Static Assets and API Endpoints
+[todo] STORY-deploy-005: Implement Automated Ephemeral Database Migration Task Runner Script
+[todo] STORY-deploy-006: Implement GitHub Actions CI/CD Pipeline Workflow for Automated Lint, Test, and ECS Deployment
