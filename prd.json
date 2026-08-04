@@ -585,13 +585,66 @@
         "Manual execution of CI workflow steps locally succeeds cleanly."
       ],
       "priority": 9,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-009"
+      ],
+      "notes": "auto-split into 3 sub-stories",
+      "effort": "small",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-setup-010a",
+      "title": "Create .env.example environment variable template",
+      "description": "Create .env.example listing all required runtime secrets: DATABASE_URL, JWT_SECRET, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_ENDPOINT.",
+      "acceptanceCriteria": [
+        ".env.example created with all 7 required variables listed",
+        "All variables have descriptive comments",
+        "No actual secret values are included"
+      ],
+      "priority": 9.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-009"
       ],
-      "notes": "",
-      "effort": "small",
-      "model": "deepseek"
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-010b",
+      "title": "Implement Zod environment variable validation",
+      "description": "Create src/lib/env.ts with Zod schema that parses and validates process.env at server startup, throwing on missing or invalid values.",
+      "acceptanceCriteria": [
+        "src/lib/env.ts created with Zod schema for all 7 env vars",
+        "Schema validates types and throws on missing variables",
+        "A getEnv() accessor exports parsed values for use elsewhere",
+        "Includes unit tests verifying valid and invalid env inputs"
+      ],
+      "priority": 9.2,
+      "effort": "medium",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-010a"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-setup-010c",
+      "title": "Create GitHub Actions CI workflow",
+      "description": "Create .github/workflows/ci.yml running checkout, node setup, dependency install, lint, TypeScript compilation, Prisma schema validation, Vitest tests, and Playwright E2E suites.",
+      "acceptanceCriteria": [
+        ".github/workflows/ci.yml created with all required steps",
+        "Workflow runs lint, typecheck, prisma validate, vitest, and playwright",
+        "Build fails on TypeScript errors or test coverage threshold breach",
+        "Workflow syntax is valid and can be triggered manually"
+      ],
+      "priority": 9.3,
+      "effort": "medium",
+      "passes": false,
+      "dependsOn": [
+        "STORY-setup-010b"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-security-001",
