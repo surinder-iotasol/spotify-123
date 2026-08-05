@@ -807,7 +807,7 @@
       ],
       "priority": 12.2,
       "effort": "low",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-security-003a"
       ],
