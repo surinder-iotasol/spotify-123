@@ -905,25 +905,6 @@
       "model": "deepseek"
     },
     {
-      "id": "STORY-security-004aa",
-      "title": "Define ownership types and error constants",
-      "description": "Create CallerClaims interface, OwnershipCheckFn type, and ERR_RESOURCE_OWNERSHIP_DENIED constant in src/lib/auth/ownership.ts.",
-      "acceptanceCriteria": [
-        "CallerClaims interface exports userId, role, and optional artistProfileId.",
-        "OwnershipCheckFn type defined as callable returning boolean.",
-        "ERR_RESOURCE_OWNERSHIP_DENIED constant exported.",
-        "OwnershipDeniedMessage constant defined but not exported."
-      ],
-      "priority": 490.1,
-      "effort": "low",
-      "passes": false,
-      "dependsOn": [
-        "STORY-security-001",
-        "STORY-security-002"
-      ],
-      "notes": ""
-    },
-    {
       "id": "STORY-security-004ab",
       "title": "Implement ownership check functions",
       "description": "Add extractCallerClaims, checkTrackOwnership, and checkPlaylistOwnership with ADMIN override in ownership.ts.",
@@ -956,25 +937,6 @@
         "STORY-security-004ab"
       ],
       "notes": ""
-    },
-    {
-      "id": "STORY-security-004aa",
-      "title": "Define ownership types: TrackRecord, PlaylistRecord, CallerIdentity",
-      "description": "Add TrackRecord, PlaylistRecord, and CallerIdentity types to ownership.ts for structured resource and caller representations.",
-      "acceptanceCriteria": [
-        "TrackRecord has id and artistProfileId fields.",
-        "PlaylistRecord has id and userId fields.",
-        "CallerIdentity has userId, role, and optional artistProfileId fields."
-      ],
-      "priority": 490.1,
-      "effort": "low",
-      "passes": false,
-      "dependsOn": [
-        "STORY-security-001",
-        "STORY-security-002"
-      ],
-      "notes": "",
-      "model": "deepseek"
     },
     {
       "id": "STORY-security-004ab",
@@ -3232,6 +3194,25 @@
       ],
       "notes": "",
       "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004aa",
+      "title": "Define ownership types: TrackRecord, PlaylistRecord, CallerIdentity",
+      "description": "Add TrackRecord, PlaylistRecord, and CallerIdentity types to ownership.ts for structured resource and caller representations.",
+      "acceptanceCriteria": [
+        "TrackRecord has id and artistProfileId fields.",
+        "PlaylistRecord has id and userId fields.",
+        "CallerIdentity has userId, role, and optional artistProfileId fields."
+      ],
+      "priority": 490.1,
+      "effort": "low",
+      "passes": true,
+      "dependsOn": [
+        "STORY-security-001",
+        "STORY-security-002"
+      ],
+      "notes": "",
       "model": "deepseek"
     }
   ]
