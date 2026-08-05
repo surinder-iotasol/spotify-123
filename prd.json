@@ -842,13 +842,68 @@
         "Integration tests assert HTTP 403 response structure when an unauthorized user attempts to edit another user's playlist or track."
       ],
       "priority": 13,
+      "passes": true,
+      "dependsOn": [
+        "STORY-security-001",
+        "STORY-security-002"
+      ],
+      "notes": "auto-split into 3 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004a",
+      "title": "Implement ownership helper functions and types",
+      "description": "Create ownership.ts with TrackRecord, PlaylistRecord, CallerIdentity types, OwnershipError class, and check functions for Track and Playlist ownership with ADMIN override.",
+      "acceptanceCriteria": [
+        "OwnershipError carries HTTP 403 status and structured error details.",
+        "checkTrackOwnership compares artistProfileId and skips for ADMIN.",
+        "checkPlaylistOwnership compares userId and skips for ADMIN."
+      ],
+      "priority": 13.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-security-001",
         "STORY-security-002"
       ],
       "notes": "",
-      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004b",
+      "title": "Add unit tests for ownership helpers",
+      "description": "Write unit tests for ownership.ts covering admin override, ownership match, mismatch, and missing profile scenarios for both Track and Playlist.",
+      "acceptanceCriteria": [
+        "Track ownership tests cover admin bypass, matching profile, mismatch, and no-profile cases.",
+        "Playlist ownership tests cover admin bypass, matching user, and mismatch cases.",
+        "OwnershipError defaults statusCode to 403 with correct shape."
+      ],
+      "priority": 13.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-004a"
+      ],
+      "notes": "",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004c",
+      "title": "Add integration tests for ownership HTTP 403 responses",
+      "description": "Write integration tests simulating route handlers that use ownership checks and return HTTP 403 with structured error envelope on unauthorized access.",
+      "acceptanceCriteria": [
+        "Unauthorized track access returns HTTP 403 with ERR_RESOURCE_OWNERSHIP_DENIED code.",
+        "Unauthorized playlist access returns HTTP 403 with ERR_RESOURCE_OWNERSHIP_DENIED code.",
+        "ADMIN role successfully accesses another user's track and playlist."
+      ],
+      "priority": 13.3,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-004b"
+      ],
+      "notes": "",
       "model": "deepseek"
     },
     {
