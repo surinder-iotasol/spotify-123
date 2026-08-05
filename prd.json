@@ -906,6 +906,59 @@
     },
     {
       "id": "STORY-security-004aa",
+      "title": "Define ownership types and error constants",
+      "description": "Create CallerClaims interface, OwnershipCheckFn type, and ERR_RESOURCE_OWNERSHIP_DENIED constant in src/lib/auth/ownership.ts.",
+      "acceptanceCriteria": [
+        "CallerClaims interface exports userId, role, and optional artistProfileId.",
+        "OwnershipCheckFn type defined as callable returning boolean.",
+        "ERR_RESOURCE_OWNERSHIP_DENIED constant exported.",
+        "OwnershipDeniedMessage constant defined but not exported."
+      ],
+      "priority": 490.1,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-001",
+        "STORY-security-002"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-security-004ab",
+      "title": "Implement ownership check functions",
+      "description": "Add extractCallerClaims, checkTrackOwnership, and checkPlaylistOwnership with ADMIN override in ownership.ts.",
+      "acceptanceCriteria": [
+        "extractCallerClaims returns null when x-user-id or x-user-role missing.",
+        "checkTrackOwnership returns true for ADMIN or matching artistProfileId.",
+        "checkPlaylistOwnership returns true for ADMIN or matching userId."
+      ],
+      "priority": 490.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-004aa"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-security-004ac",
+      "title": "Build ownership error response and middleware wrapper",
+      "description": "Implement buildOwnershipErrorResponse and requireOwnership wrapper in ownership.ts.",
+      "acceptanceCriteria": [
+        "buildOwnershipErrorResponse returns HTTP 403 with structured error envelope.",
+        "requireOwnership extracts caller claims and returns 403 or invokes handler.",
+        "requireOwnership returns 401 when caller claims are absent."
+      ],
+      "priority": 490.3,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-004ab"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-security-004aa",
       "title": "Define ownership types: TrackRecord, PlaylistRecord, CallerIdentity",
       "description": "Add TrackRecord, PlaylistRecord, and CallerIdentity types to ownership.ts for structured resource and caller representations.",
       "acceptanceCriteria": [
