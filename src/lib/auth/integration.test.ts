@@ -4,7 +4,8 @@
  *
  * Exercises the full pipeline: JWT generation → cookie extraction →
  * middleware path matching → role enforcement.  Verifies HTTP 401 for
- * unauthenticated requests and HTTP 403 for non-admin roles.
+ * unauthenticated requests, HTTP 403 for insufficient role, and proper
+ * header injection for protected routes.
  */
 
 import { describe, expect, it, beforeAll } from "vitest";
@@ -32,6 +33,12 @@ const ADMIN_PAYLOAD: SessionPayload = {
   role: "ADMIN",
 };
 
+const ARTIST_PAYLOAD: SessionPayload = {
+  userId: "artist-001",
+  role: "ARTIST",
+  artistProfileId: "ap-001",
+};
+
 const LISTENER_PAYLOAD: SessionPayload = {
   userId: "listener-001",
   role: "LISTENER",
@@ -53,7 +60,7 @@ describe("401 Unauthenticated", () => {
 
   it("returns 401 when session cookie is empty", async () => {
     const request = new NextRequest("http://localhost/admin/dashboard");
-    request.cookies.set("session", "");
+    request.cookies.set("__Host-indie_session", "");
     const response = await middleware(request);
 
     expect(response.status).toBe(401);
@@ -63,12 +70,31 @@ describe("401 Unauthenticated", () => {
 
   it("returns 401 for invalid JWT", async () => {
     const request = new NextRequest("http://localhost/admin/dashboard");
-    request.cookies.set("session", "invalid-token");
+    request.cookies.set("__Host-indie_session", "invalid-token");
     const response = await middleware(request);
 
     expect(response.status).toBe(401);
     const body = (await response.json()) as { error: { code: string } };
     expect(body.error.code).toBe("UNAUTHENTICATED");
+  });
+
+  // New routes covered by integration tests
+  it("returns 401 on /api/v1/artist/* without session", async () => {
+    const request = new NextRequest("http://localhost/api/v1/artist/profile");
+    const response = await middleware(request);
+    expect(response.status).toBe(401);
+  });
+
+  it("returns 401 on /api/v1/playlists/* without session", async () => {
+    const request = new NextRequest("http://localhost/api/v1/playlists/create");
+    const response = await middleware(request);
+    expect(response.status).toBe(401);
+  });
+
+  it("returns 401 on /api/v1/reports/* without session", async () => {
+    const request = new NextRequest("http://localhost/api/v1/reports/abuse");
+    const response = await middleware(request);
+    expect(response.status).toBe(401);
   });
 });
 
@@ -80,7 +106,7 @@ describe("403 Forbidden Insufficient Role", () => {
   it("returns 403 for LISTENER role on /admin/*", async () => {
     const token = await generateToken(LISTENER_PAYLOAD);
     const request = new NextRequest("http://localhost/admin/dashboard");
-    request.cookies.set("session", token);
+    request.cookies.set("__Host-indie_session", token);
     const response = await middleware(request);
 
     expect(response.status).toBe(403);
@@ -91,7 +117,29 @@ describe("403 Forbidden Insufficient Role", () => {
   it("returns 403 for LISTENER role on /api/v1/admin/*", async () => {
     const token = await generateToken(LISTENER_PAYLOAD);
     const request = new NextRequest("http://localhost/api/v1/admin/users");
-    request.cookies.set("session", token);
+    request.cookies.set("__Host-indie_session", token);
+    const response = await middleware(request);
+
+    expect(response.status).toBe(403);
+    const body = (await response.json()) as { error: { code: string } };
+    expect(body.error.code).toBe("FORBIDDEN_INSUFFICIENT_ROLE");
+  });
+
+  it("returns 403 for LISTENER on /api/v1/artist/*", async () => {
+    const token = await generateToken(LISTENER_PAYLOAD);
+    const request = new NextRequest("http://localhost/api/v1/artist/profile");
+    request.cookies.set("__Host-indie_session", token);
+    const response = await middleware(request);
+
+    expect(response.status).toBe(403);
+    const body = (await response.json()) as { error: { code: string } };
+    expect(body.error.code).toBe("FORBIDDEN_INSUFFICIENT_ROLE");
+  });
+
+  it("returns 403 for ARTIST on /admin/*", async () => {
+    const token = await generateToken(ARTIST_PAYLOAD);
+    const request = new NextRequest("http://localhost/admin/dashboard");
+    request.cookies.set("__Host-indie_session", token);
     const response = await middleware(request);
 
     expect(response.status).toBe(403);
@@ -101,14 +149,14 @@ describe("403 Forbidden Insufficient Role", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 200 — Admin access granted
+// 200 — Access granted with role hierarchy
 // ---------------------------------------------------------------------------
 
-describe("200 — Admin access", () => {
+describe("200 — Access granted", () => {
   it("allows ADMIN on /admin/*", async () => {
     const token = await generateToken(ADMIN_PAYLOAD);
     const request = new NextRequest("http://localhost/admin/dashboard");
-    request.cookies.set("session", token);
+    request.cookies.set("__Host-indie_session", token);
     const response = await middleware(request);
 
     expect(response.status).toBe(200);
@@ -117,7 +165,53 @@ describe("200 — Admin access", () => {
   it("allows ADMIN on /api/v1/admin/*", async () => {
     const token = await generateToken(ADMIN_PAYLOAD);
     const request = new NextRequest("http://localhost/api/v1/admin/settings");
-    request.cookies.set("session", token);
+    request.cookies.set("__Host-indie_session", token);
+    const response = await middleware(request);
+
+    expect(response.status).toBe(200);
+  });
+
+  // New role hierarchy tests
+  it("allows ARTIST on /api/v1/artist/*", async () => {
+    const token = await generateToken(ARTIST_PAYLOAD);
+    const request = new NextRequest("http://localhost/api/v1/artist/profile");
+    request.cookies.set("__Host-indie_session", token);
+    const response = await middleware(request);
+
+    expect(response.status).toBe(200);
+  });
+
+  it("allows ARTIST on /api/v1/playlists/*", async () => {
+    const token = await generateToken(ARTIST_PAYLOAD);
+    const request = new NextRequest("http://localhost/api/v1/playlists/create");
+    request.cookies.set("__Host-indie_session", token);
+    const response = await middleware(request);
+
+    expect(response.status).toBe(200);
+  });
+
+  it("allows ARTIST on /api/v1/reports/*", async () => {
+    const token = await generateToken(ARTIST_PAYLOAD);
+    const request = new NextRequest("http://localhost/api/v1/reports/abuse");
+    request.cookies.set("__Host-indie_session", token);
+    const response = await middleware(request);
+
+    expect(response.status).toBe(200);
+  });
+
+  it("allows LISTENER on /api/v1/playlists/*", async () => {
+    const token = await generateToken(LISTENER_PAYLOAD);
+    const request = new NextRequest("http://localhost/api/v1/playlists/create");
+    request.cookies.set("__Host-indie_session", token);
+    const response = await middleware(request);
+
+    expect(response.status).toBe(200);
+  });
+
+  it("allows LISTENER on /api/v1/reports/*", async () => {
+    const token = await generateToken(LISTENER_PAYLOAD);
+    const request = new NextRequest("http://localhost/api/v1/reports/abuse");
+    request.cookies.set("__Host-indie_session", token);
     const response = await middleware(request);
 
     expect(response.status).toBe(200);
@@ -134,8 +228,9 @@ describe("Cookie helpers", () => {
     const header = createSetCookieHeader(token);
     expect(header).toContain("HttpOnly");
     expect(header).toContain("SameSite=Strict");
+    expect(header).toContain("Secure");
     expect(header).toContain("Max-Age=");
-    expect(header).toContain("session=");
+    expect(header).toContain("__Host-indie_session=");
   });
 
   it("createDeleteCookieHeader expires the cookie", () => {
@@ -165,6 +260,18 @@ describe("Path matching", () => {
 
   it("does not intercept /api/v2/admin/* (different version)", async () => {
     const request = new NextRequest("http://localhost/api/v2/admin/legacy");
+    const response = await middleware(request);
+    expect(response.status).toBe(200);
+  });
+
+  it("allows guest track streaming", async () => {
+    const request = new NextRequest("http://localhost/api/v1/tracks/123/stream");
+    const response = await middleware(request);
+    expect(response.status).toBe(200);
+  });
+
+  it("allows guest search", async () => {
+    const request = new NextRequest("http://localhost/api/v1/search");
     const response = await middleware(request);
     expect(response.status).toBe(200);
   });

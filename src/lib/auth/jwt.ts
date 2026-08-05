@@ -15,29 +15,35 @@ import { jwtVerify, type JWTPayload } from "jose";
 // ---------------------------------------------------------------------------
 
 /** JWT expiration time — 7 days in seconds. */
-const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
+const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60; // 604800
 
-/** Cookie name used to store the JWT session token. */
-const COOKIE_NAME = "session";
-
-/** Cookie options: HTTP-only, strict same-site, no path prefix. */
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  sameSite: "strict" as const,
-  path: "/",
-  secure: process.env.NODE_ENV === "production",
-};
+/** Cookie name used to store the JWT session token.
+ *
+ * The `__Host-` prefix enforces Secure, Path=/, and SameSite=Strict
+ * at the browser level per RFC 6265 §5.2.4.
+ */
+const COOKIE_NAME = "__Host-indie_session";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+/** Thrown when a JWT cannot be verified (expired, tampered, missing secret). */
+export class SessionInvalidError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SessionInvalidError";
+  }
+}
 
 /** Decoded session payload extracted from a JWT. */
 export interface SessionPayload extends JWTPayload {
   /** Prisma User ID (string in MongoDB). */
   userId: string;
   /** User role: LISTENER, ARTIST, or ADMIN. */
-  role: string;
+  role: "LISTENER" | "ARTIST" | "ADMIN";
+  /** Optional artist profile ID — set for ARTIST role tokens. */
+  artistProfileId?: string;
 }
 
 /** A Set-Cookie header value string. */
@@ -50,23 +56,15 @@ export type SetCookieHeader = string;
 /**
  * Resolve the signing secret used for JWT operations.
  *
- * Throws at runtime if `JWT_SECRET` is not set.
+ * Throws a structured `SessionInvalidError` if `JWT_SECRET` is not set,
+ * so callers never get a confusing DOMException from jose.
  */
 function getSigningKey(): Uint8Array {
   const secret = process.env.JWT_SECRET;
   if (!secret || secret.length === 0) {
-    throw new Error("JWT_SECRET environment variable is required");
+    throw new SessionInvalidError("JWT_SECRET environment variable is required");
   }
   return new TextEncoder().encode(secret);
-}
-
-/**
- * Resolve the key used for JWT signing.
- */
-async function getSigningKeyRaw(): Promise<Uint8Array> {
-  const key = getSigningKey();
-  // For HS256 (HMAC) the key is raw bytes
-  return key;
 }
 
 // ---------------------------------------------------------------------------
@@ -76,41 +74,73 @@ async function getSigningKeyRaw(): Promise<Uint8Array> {
 /**
  * Generate a signed JWT containing a session payload.
  *
- * The token is valid for 7 days and carries `userId` and `role` claims.
+ * The token is valid for 7 days and carries `userId`, `role`, and optional
+ * `artistProfileId` claims.
  *
  * @param payload - The session claims to embed.
  * @returns A signed JWT string.
  */
 export async function generateToken(payload: SessionPayload): Promise<string> {
-  const key = await getSigningKeyRaw();
   const secret = getSigningKey();
 
-  return new SignJWT({ userId: payload.userId, role: payload.role })
+  const builder = new SignJWT({
+    userId: payload.userId,
+    role: payload.role,
+    ...(payload.artistProfileId != null
+      ? { artistProfileId: payload.artistProfileId }
+      : {}),
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS)
-    .setSubject(payload.userId)
-    .sign(secret);
+    .setSubject(payload.userId);
+
+  return builder.sign(secret);
 }
 
 /**
  * Verify and decode a JWT session token.
  *
+ * Throws `SessionInvalidError` for expired tokens, tampered signatures, or
+ * a missing `JWT_SECRET`.  Returns the decoded `SessionPayload` on success.
+ *
  * @param token - The JWT string to verify.
- * @returns The decoded `SessionPayload` or `null` if verification fails.
+ * @returns The decoded `SessionPayload`.
+ * @throws SessionInvalidError if verification fails.
  */
 export async function verifyToken(
   token: string,
-): Promise<SessionPayload | null> {
+): Promise<SessionPayload> {
+  const secret = getSigningKey();
+
   try {
-    const secret = getSigningKey();
-    const { payload } = await jwtVerify<{ userId: string; role: string }>(
-      token,
-      secret,
-    );
-    return { userId: payload.userId, role: payload.role } as SessionPayload;
-  } catch {
-    return null;
+    const { payload } = await jwtVerify(token, secret);
+    // payload is JWTPayload (may include iat, exp, sub, etc.)
+    // We need the minimum required claims
+    const userId = (payload as Record<string, unknown>).userId as
+      | string
+      | undefined;
+    const role = (payload as Record<string, unknown>).role as
+      | string
+      | undefined;
+
+    if (!userId || !role) {
+      throw new SessionInvalidError("Missing required claims in token");
+    }
+
+    return {
+      userId,
+      role: role as "LISTENER" | "ARTIST" | "ADMIN",
+      artistProfileId: (payload as Record<string, unknown>)
+        .artistProfileId as string | undefined,
+      iat: payload.iat,
+      exp: payload.exp,
+    };
+  } catch (err) {
+    // jose throws JWTVerifyError (base), JWTExpired, JWEError, etc.
+    // Normalise everything to SessionInvalidError.
+    if (err instanceof SessionInvalidError) throw err;
+    throw new SessionInvalidError("Invalid or expired session token");
   }
 }
 
@@ -121,7 +151,7 @@ export async function verifyToken(
  * @returns A `Set-Cookie` header value.
  */
 export function createSetCookieHeader(token: string): SetCookieHeader {
-  return `${COOKIE_NAME}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_TTL_SECONDS}; ${COOKIE_OPTIONS.secure ? "Secure;" : ""}`;
+  return `${COOKIE_NAME}=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_TTL_SECONDS}`;
 }
 
 /**
@@ -130,5 +160,5 @@ export function createSetCookieHeader(token: string): SetCookieHeader {
  * @returns A `Set-Cookie` header that expires the token.
  */
 export function createDeleteCookieHeader(): SetCookieHeader {
-  return `${COOKIE_NAME}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0; ${COOKIE_OPTIONS.secure ? "Secure;" : ""}`;
+  return `${COOKIE_NAME}=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`;
 }

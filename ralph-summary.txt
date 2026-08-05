@@ -1,8 +1,8 @@
-Ralph Summary - Wed Aug  5 07:51:35 AM AEST 2026
-Mode: fresh-context | Context: 200K (default) | Effort: medium | Cost: ~$0.30
-Iterations: 3 | Stories: 29/137 | Runtime: 0h 5m
-Models: Opus=3 Sonnet=0 Haiku=0 | Quota pauses: 0 (0m)
-Auto-splits: 1 | Smart saves: 0 | Idle kills: 0
+Ralph Summary - Wed Aug  5 10:16:24 AM AEST 2026
+Mode: fresh-context | Context: 200K (default) | Effort: medium | Cost: ~$0.10
+Iterations: 1 | Stories: 44/147 | Runtime: 0h 0m
+Models: Opus=1 Sonnet=0 Haiku=0 | Quota pauses: 0 (0m)
+Auto-splits: 0 | Smart saves: 0 | Idle kills: 0
 [done] STORY-setup-001: Initialize repository workspace git config and project root files
 [done] STORY-setup-001a: Create root package.json for spotify project
 [done] STORY-setup-001b: Create comprehensive .gitignore for Node and Next.js
@@ -32,14 +32,24 @@ Auto-splits: 1 | Smart saves: 0 | Idle kills: 0
 [done] STORY-setup-007b: Add integration tests for JWT auth and RBAC
 [done] STORY-setup-008: Implement limit-offset pagination contracts and response helpers
 [done] STORY-setup-009: Configure Vitest unit integration test runner and Playwright E2E setup
-[todo] STORY-setup-009a: Verify Vitest config with testing-library and Node environment
-[todo] STORY-setup-009b: Verify Playwright config with desktop and mobile viewports
-[todo] STORY-setup-009c: Run and verify all sample tests pass
-[todo] STORY-setup-009d: Commit test runner configuration and package scripts
-[todo] STORY-setup-010: Configure environment variable schema template and GitHub Actions CI workflow
-[todo] STORY-security-001: Implement Bcrypt Password Hashing and Payload Sanitization Utility
-[todo] STORY-security-002: Implement Session JWT Token Service and Secure Cookie Serialization
-[todo] STORY-security-003: Implement Next.js Edge Middleware for Server-Side Route Guarding
+[done] STORY-setup-009a: Verify Vitest config with testing-library and Node environment
+[done] STORY-setup-009b: Verify Playwright config with desktop and mobile viewports
+[done] STORY-setup-009c: Run and verify all sample tests pass
+[done] STORY-setup-009d: Commit test runner configuration and package scripts
+[done] STORY-setup-010: Configure environment variable schema template and GitHub Actions CI workflow
+[done] STORY-setup-010a: Create .env.example environment variable template
+[done] STORY-setup-010b: Implement Zod environment variable validation
+[done] STORY-setup-010c: Create GitHub Actions CI workflow
+[done] STORY-security-001: Implement Bcrypt Password Hashing and Payload Sanitization Utility
+[done] STORY-security-001a: Create User payload sanitization utility
+[done] STORY-security-001b: Add Prisma User select wrapper to omit passwordHash
+[done] STORY-security-002: Implement Session JWT Token Service and Secure Cookie Serialization
+[done] STORY-security-002a: Fix JWT unit tests to match actual implementation
+[done] STORY-security-002b: Add JWT expiration and artistProfileId test coverage
+[done] STORY-security-003: Implement Next.js Edge Middleware for Server-Side Route Guarding
+[todo] STORY-security-003a: Implement Edge Middleware Route Guarding
+[todo] STORY-security-003b: Add Middleware Unit Tests
+[todo] STORY-security-003c: Add Middleware Integration Tests
 [todo] STORY-security-004: Implement Resource Ownership Verification Helpers and IDOR Protection
 [todo] STORY-security-005: Implement Higher-Order withAuth and withRole API Handler Wrappers
 [todo] STORY-storage-001: Implement Unified StorageProvider Interface for S3 and Cloudflare R2
