@@ -768,14 +768,67 @@
         "Integration tests verify HTTP 401, 403, and header injection behavior for protected API routes."
       ],
       "priority": 12,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-007",
+        "STORY-security-002"
+      ],
+      "notes": "auto-split into 3 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-003a",
+      "title": "Implement Edge Middleware Route Guarding",
+      "description": "Create src/middleware.ts with Next.js Edge Middleware that intercepts protected routes, verifies JWT session cookies, enforces role hierarchy, and injects decoded identity headers into proxied requests.",
+      "acceptanceCriteria": [
+        "Unauthenticated requests to protected routes return HTTP 401 Unauthorized.",
+        "Authenticated requests lacking required roles return HTTP 403 Forbidden.",
+        "Valid requests propagate x-user-id, x-user-role, and x-artist-profile-id headers to downstream handlers.",
+        "Public routes bypass middleware role checks entirely."
+      ],
+      "priority": 12.1,
+      "effort": "medium",
       "passes": false,
       "dependsOn": [
         "STORY-setup-007",
         "STORY-security-002"
       ],
-      "notes": "",
+      "notes": ""
+    },
+    {
+      "id": "STORY-security-003b",
+      "title": "Add Middleware Unit Tests",
+      "description": "Write unit tests for middleware claim parsing, role hierarchy evaluation, and route matcher logic covering all protected and public path prefixes.",
+      "acceptanceCriteria": [
+        "Unit tests verify findRouteRule matches all protected prefixes and returns null for public paths.",
+        "Unit tests verify roleSatisfies correctly evaluates the role hierarchy for all role combinations.",
+        "Unit tests verify claim extraction returns correct userId, role, and artistProfileId from session payload."
+      ],
+      "priority": 12.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-003a"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-security-003c",
+      "title": "Add Middleware Integration Tests",
+      "description": "Write integration tests that verify HTTP 401, 403, and header injection behavior for protected API routes using Next.js test utilities.",
+      "acceptanceCriteria": [
+        "Integration tests verify unauthenticated requests to /admin/* and /api/v1/admin/* return HTTP 401.",
+        "Integration tests verify role-mismatched requests to /api/v1/artist/* return HTTP 403.",
+        "Integration tests verify valid authenticated requests receive injected x-user-id, x-user-role, and x-artist-profile-id headers."
+      ],
+      "priority": 12.3,
       "effort": "medium",
-      "model": "deepseek"
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-003b"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-security-004",
