@@ -12,7 +12,7 @@
         "`README.md` documents repository layout, setup prerequisites, and development scripts.",
         "Root `package.json` initializes project name as `spotify` with private package status."
       ],
-      "priority": 0,
+      "priority": 10,
       "passes": true,
       "dependsOn": [],
       "notes": "auto-split into 4 sub-stories",
@@ -27,11 +27,12 @@
         "Root package.json exists with name field set to spotify.",
         "Package marked as private with no version or main fields required."
       ],
-      "priority": 0.1,
+      "priority": 20,
       "effort": "low",
       "passes": true,
       "dependsOn": [],
-      "notes": "Git already initialized in prior commit fd80601."
+      "notes": "Git already initialized in prior commit fd80601.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-001b",
@@ -40,13 +41,14 @@
       "acceptanceCriteria": [
         ".gitignore exists and covers node_modules, .next, .env, and build artifacts."
       ],
-      "priority": 0.2,
+      "priority": 30,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-001a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-001c",
@@ -55,13 +57,14 @@
       "acceptanceCriteria": [
         ".editorconfig exists with 2-space indentation, UTF-8 encoding, and LF line endings."
       ],
-      "priority": 0.30000000000000004,
+      "priority": 40,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-001b"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-001d",
@@ -70,13 +73,14 @@
       "acceptanceCriteria": [
         "README.md exists with repository layout, setup prerequisites, and development scripts documented."
       ],
-      "priority": 0.4,
+      "priority": 50,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-001c"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-002",
@@ -89,7 +93,7 @@
         "Running `npm run build` completes with exit code 0 and produces optimized standalone build output.",
         "Running `npm run dev` boots Next.js development server on `http://localhost:3000` without runtime errors."
       ],
-      "priority": 1,
+      "priority": 60,
       "passes": true,
       "dependsOn": [
         "STORY-setup-001"
@@ -109,7 +113,7 @@
         "`components.json` configured for shadcn/ui primitive component auto-generation.",
         "Unit test verifies helper utility `cn()` correctly merges Tailwind CSS classes."
       ],
-      "priority": 2,
+      "priority": 70,
       "passes": true,
       "dependsOn": [
         "STORY-setup-002"
@@ -126,13 +130,14 @@
         "tailwind.config.js configures dark mode, HSL color tokens, and content paths for /src",
         "postcss.config.js registered with tailwindcss and autoprefixer"
       ],
-      "priority": 2.1,
+      "priority": 80,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-002"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-003b",
@@ -142,13 +147,14 @@
         "globals.css defines CSS custom properties for dark-first HSL palette",
         "globals.css achieves WCAG AA contrast levels for text and interactive elements"
       ],
-      "priority": 2.2,
+      "priority": 90,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-003a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-003c",
@@ -158,13 +164,14 @@
         "components.json configured with correct component, token, and style paths",
         "components.json sets aliases for @/ to src/ directories"
       ],
-      "priority": 2.3,
+      "priority": 100,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-003b"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-003d",
@@ -174,13 +181,14 @@
         "lib/utils.ts exports cn() function merging Tailwind classes",
         "Unit test verifies cn() correctly merges conflicting and additive classes"
       ],
-      "priority": 2.4,
+      "priority": 110,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-003c"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-004",
@@ -193,7 +201,7 @@
         "`npx prisma validate` succeeds and `npx prisma generate` outputs type-safe PrismaClient SDK.",
         "Unit test instantiates PrismaClient and validates all model typings compile without TypeScript errors."
       ],
-      "priority": 3,
+      "priority": 120,
       "passes": true,
       "dependsOn": [
         "STORY-setup-003"
@@ -210,13 +218,14 @@
         "npx prisma validate reports no errors on the existing prisma/schema.prisma.",
         "npx prisma generate outputs a type-safe PrismaClient SDK successfully."
       ],
-      "priority": 3.1,
+      "priority": 130,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-003"
       ],
-      "notes": "Schema already exists with all 9 models, 7 enums, and compound indexes. This story is purely verification."
+      "notes": "Schema already exists with all 9 models, 7 enums, and compound indexes. This story is purely verification.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-004b",
@@ -226,13 +235,14 @@
         "Test file imports and instantiates PrismaClient from @prisma/client.",
         "All 9 model types (User, ArtistProfile, Track, Playlist, PlaylistTrack, Like, Follow, Report, AuditLog) compile without TypeScript errors."
       ],
-      "priority": 3.2,
+      "priority": 140,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-004a"
       ],
-      "notes": "Schema and prisma client already exist. Story only adds the unit test."
+      "notes": "Schema and prisma client already exist. Story only adds the unit test.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-005",
@@ -245,7 +255,7 @@
         "Unit tests mock S3 client and verify correct presigned URL generation and parameter passing for `putObject` and `getObject`.",
         "Integration test validates audio upload size constraint validation helper caps files at 50MB."
       ],
-      "priority": 4,
+      "priority": 150,
       "passes": true,
       "dependsOn": [
         "STORY-setup-004"
@@ -263,13 +273,14 @@
         "TypeScript types exported for StorageConfig, UploadParams, and PresignedUrlResult.",
         "src/lib/storage/storage.service.ts file scaffolded with interface definition only."
       ],
-      "priority": 4.1,
+      "priority": 160,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-004"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-005b",
@@ -280,13 +291,14 @@
         "generateSignedUrl produces 60-minute presigned PUT URLs for uploads.",
         "generateSignedUrl enforces 3600-second TTL cap for getObject streaming delivery URLs."
       ],
-      "priority": 4.2,
+      "priority": 170,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-setup-005a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-005c",
@@ -297,13 +309,14 @@
         "Function returns true when file size is at or below 50MB threshold.",
         "Unit test verifies 50MB cap enforcement with valid and invalid sizes."
       ],
-      "priority": 4.3,
+      "priority": 180,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-005b"
       ],
-      "notes": "Validation helper consumed by S3 service for upload size enforcement."
+      "notes": "Validation helper consumed by S3 service for upload size enforcement.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-006",
@@ -316,7 +329,7 @@
         "Passwords and sensitive credentials are sanitized and excluded from error payload outputs and log traces.",
         "Integration tests cover `apiSuccessResponse`, `apiErrorResponse`, and Zod validation failure scenarios for HTTP status codes 400, 422, and 500."
       ],
-      "priority": 5,
+      "priority": 190,
       "passes": true,
       "dependsOn": [
         "STORY-setup-005"
@@ -334,13 +347,14 @@
         "apiErrorResponse constructs payload with success false, error code, message, and optional details array.",
         "Sensitive fields like passwords and tokens are redacted from both success and error payloads."
       ],
-      "priority": 5.1,
+      "priority": 200,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-005"
       ],
-      "notes": "Covers src/lib/api/response.ts only. Types: ApiSuccessResponse, ApiErrorResponse, ValidationErrorDetail."
+      "notes": "Covers src/lib/api/response.ts only. Types: ApiSuccessResponse, ApiErrorResponse, ValidationErrorDetail.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-006b",
@@ -351,13 +365,14 @@
         "Validation failure throws ValidationError with statusCode 422 and ValidationErrorDetail entries.",
         "Nested field paths are formatted as dot-separated strings prefixed with body."
       ],
-      "priority": 5.2,
+      "priority": 210,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-006a"
       ],
-      "notes": "Covers src/lib/api/validation.ts. Depends on ValidationErrorDetail type from response.ts."
+      "notes": "Covers src/lib/api/validation.ts. Depends on ValidationErrorDetail type from response.ts.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-006c",
@@ -368,13 +383,14 @@
         "Tests verify error envelope structure, details array, and requestId behavior.",
         "Tests verify nested and array payload sanitization does not mutate originals."
       ],
-      "priority": 5.3,
+      "priority": 220,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-006a"
       ],
-      "notes": "Covers src/lib/api/response.test.ts."
+      "notes": "Covers src/lib/api/response.test.ts.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-006d",
@@ -385,13 +401,14 @@
         "Tests verify missing required fields and invalid types throw ValidationError with 422 status.",
         "Tests verify nested dot-separated field paths and custom error messages in details."
       ],
-      "priority": 5.4,
+      "priority": 230,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-006b"
       ],
-      "notes": "Covers src/lib/api/validation.test.ts."
+      "notes": "Covers src/lib/api/validation.test.ts.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-006e",
@@ -402,14 +419,15 @@
         "Tests simulate 422 validation failures with proper detail arrays and request IDs.",
         "Tests simulate 500 internal errors and verify no password leakage in any response."
       ],
-      "priority": 5.5,
+      "priority": 240,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-006c",
         "STORY-setup-006d"
       ],
-      "notes": "Covers src/lib/api/integration.test.ts. Depends on both response and validation tests being solid."
+      "notes": "Covers src/lib/api/integration.test.ts. Depends on both response and validation tests being solid.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-007",
@@ -422,7 +440,7 @@
         "Unauthenticated requests to protected paths return HTTP 401 `UNAUTHENTICATED`, non-admin requests return HTTP 403 `FORBIDDEN_INSUFFICIENT_ROLE`.",
         "Integration tests verify JWT session extraction from HTTP-only cookies and RBAC route protection for Listener vs Admin roles."
       ],
-      "priority": 6,
+      "priority": 250,
       "passes": true,
       "dependsOn": [
         "STORY-setup-006"
@@ -440,13 +458,14 @@
         "Middleware extracts the session JWT from HTTP-only cookies, verifies it, and checks the role claim is ADMIN.",
         "Unauthenticated requests return HTTP 401 UNAUTHENTICATED; non-admin requests return HTTP 403 FORBIDDEN_INSUFFICIENT_ROLE."
       ],
-      "priority": 6.1,
+      "priority": 260,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-setup-006"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-007b",
@@ -457,13 +476,14 @@
         "Tests confirm non-admin roles are rejected with 403 on /api/v1/admin/* and /admin/* paths.",
         "Tests confirm unauthenticated requests receive 401 responses on protected admin routes."
       ],
-      "priority": 6.2,
+      "priority": 270,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-setup-007a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-008",
@@ -476,7 +496,7 @@
         "Unit tests in `src/lib/api/pagination.test.ts` test default fallback, maximum clamping, and total page calculation math.",
         "Integration test verifies query parameter parsing against a dummy collection route."
       ],
-      "priority": 7,
+      "priority": 280,
       "passes": true,
       "dependsOn": [
         "STORY-setup-007"
@@ -496,7 +516,7 @@
         "`npm run test:e2e` executes Playwright specs against running dev server with exit code 0.",
         "Sample unit test `src/lib/sample.test.ts` and sample E2E spec `e2e/home.spec.ts` pass cleanly."
       ],
-      "priority": 8,
+      "priority": 290,
       "passes": true,
       "dependsOn": [
         "STORY-setup-008"
@@ -514,13 +534,14 @@
         "vitest.config.ts exclude patterns isolate e2e tests from unit suite.",
         "npm run test executes without configuration errors."
       ],
-      "priority": 8.1,
+      "priority": 300,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-008"
       ],
-      "notes": "Files vitest.config.ts and vitest.setup.ts already exist in modified state."
+      "notes": "Files vitest.config.ts and vitest.setup.ts already exist in modified state.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-009b",
@@ -531,13 +552,14 @@
         "webServer configuration launches the dev server before E2E tests.",
         "npm run test:e2e can resolve the Playwright binary for execution."
       ],
-      "priority": 8.2,
+      "priority": 310,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-009a"
       ],
-      "notes": "playwright.config.ts already exists with desktop and iPhone 12 projects."
+      "notes": "playwright.config.ts already exists with desktop and iPhone 12 projects.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-009c",
@@ -548,13 +570,14 @@
         "e2e/home.spec.ts passes via npm run test:e2e against running dev server.",
         "No TypeScript compilation errors from test files."
       ],
-      "priority": 8.3,
+      "priority": 320,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-setup-009b"
       ],
-      "notes": "sample.test.ts and home.spec.ts already exist with basic assertions."
+      "notes": "sample.test.ts and home.spec.ts already exist with basic assertions.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-009d",
@@ -565,13 +588,14 @@
         "All modified test config files are committed.",
         "git status shows clean working tree after commit."
       ],
-      "priority": 8.4,
+      "priority": 330,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-009c"
       ],
-      "notes": "package.json already has correct scripts; vitest, playwright configs, and sample tests are modified."
+      "notes": "package.json already has correct scripts; vitest, playwright configs, and sample tests are modified.",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-010",
@@ -584,7 +608,7 @@
         "Build fails in CI if TypeScript compilation contains errors or test coverage target is breached.",
         "Manual execution of CI workflow steps locally succeeds cleanly."
       ],
-      "priority": 9,
+      "priority": 340,
       "passes": true,
       "dependsOn": [
         "STORY-setup-009"
@@ -602,13 +626,14 @@
         "All variables have descriptive comments",
         "No actual secret values are included"
       ],
-      "priority": 9.1,
+      "priority": 350,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-009"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-010b",
@@ -620,13 +645,14 @@
         "A getEnv() accessor exports parsed values for use elsewhere",
         "Includes unit tests verifying valid and invalid env inputs"
       ],
-      "priority": 9.2,
+      "priority": 360,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-setup-010a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-setup-010c",
@@ -638,13 +664,14 @@
         "Build fails on TypeScript errors or test coverage threshold breach",
         "Workflow syntax is valid and can be triggered manually"
       ],
-      "priority": 9.3,
+      "priority": 370,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-setup-010b"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-001",
@@ -658,7 +685,7 @@
         "Password hashes are never written to standard log streams or error stack trace outputs per sec-024 sensitive data security rules.",
         "Unit tests in tests/unit/security/password.test.ts verify hashing, cost factor 12 execution time (~250ms), verification logic, and payload sanitization."
       ],
-      "priority": 10,
+      "priority": 380,
       "passes": true,
       "dependsOn": [
         "STORY-setup-004"
@@ -676,13 +703,14 @@
         "sanitizeUserArray applies sanitization to each element in a user array and returns a new array.",
         "Unit tests verify that passwordHash is stripped while all other fields pass through unchanged."
       ],
-      "priority": 10.1,
+      "priority": 390,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-004"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-001b",
@@ -693,13 +721,14 @@
         "Users can apply the select wrapper in Prisma queries to prevent passwordHash from appearing in results.",
         "Unit test verifies the select wrapper shape includes all User fields except passwordHash."
       ],
-      "priority": 10.2,
+      "priority": 400,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-security-001a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-002",
@@ -712,7 +741,7 @@
         "All timestamp claims (iat, exp) adhere to UTC ISO-8601 / Unix epoch standards in UTC per constraint 0.",
         "Unit tests in tests/unit/security/session.test.ts cover token creation, claim validation, signature tampering, expiration checks, and cookie header formatting."
       ],
-      "priority": 11,
+      "priority": 410,
       "passes": true,
       "dependsOn": [
         "STORY-setup-007"
@@ -730,13 +759,14 @@
         "createSetCookieHeader assertions check for __Host-indie_session cookie name.",
         "createDeleteCookieHeader assertions check for __Host-indie_session cookie name."
       ],
-      "priority": 11.1,
+      "priority": 420,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-setup-007"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-002b",
@@ -747,13 +777,14 @@
         "Token generation includes optional artistProfileId claim when provided.",
         "Missing JWT_SECRET throws SessionInvalidError during token generation."
       ],
-      "priority": 11.2,
+      "priority": 430,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-security-002a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-003",
@@ -767,7 +798,7 @@
         "Unit tests cover middleware claim parsing and route matcher logic.",
         "Integration tests verify HTTP 401, 403, and header injection behavior for protected API routes."
       ],
-      "priority": 12,
+      "priority": 440,
       "passes": true,
       "dependsOn": [
         "STORY-setup-007",
@@ -787,14 +818,15 @@
         "Valid requests propagate x-user-id, x-user-role, and x-artist-profile-id headers to downstream handlers.",
         "Public routes bypass middleware role checks entirely."
       ],
-      "priority": 12.1,
+      "priority": 450,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-setup-007",
         "STORY-security-002"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-003b",
@@ -805,13 +837,14 @@
         "Unit tests verify roleSatisfies correctly evaluates the role hierarchy for all role combinations.",
         "Unit tests verify claim extraction returns correct userId, role, and artistProfileId from session payload."
       ],
-      "priority": 12.2,
+      "priority": 460,
       "effort": "low",
       "passes": true,
       "dependsOn": [
         "STORY-security-003a"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-003c",
@@ -822,13 +855,14 @@
         "Integration tests verify role-mismatched requests to /api/v1/artist/* return HTTP 403.",
         "Integration tests verify valid authenticated requests receive injected x-user-id, x-user-role, and x-artist-profile-id headers."
       ],
-      "priority": 12.3,
+      "priority": 470,
       "effort": "medium",
       "passes": true,
       "dependsOn": [
         "STORY-security-003b"
       ],
-      "notes": ""
+      "notes": "",
+      "model": "sonnet"
     },
     {
       "id": "STORY-security-004",
@@ -841,7 +875,7 @@
         "Admin role overrides ownership restrictions across all Track and Playlist update and delete handlers.",
         "Integration tests assert HTTP 403 response structure when an unauthorized user attempts to edit another user's playlist or track."
       ],
-      "priority": 13,
+      "priority": 480,
       "passes": true,
       "dependsOn": [
         "STORY-security-001",
@@ -860,12 +894,67 @@
         "checkTrackOwnership compares artistProfileId and skips for ADMIN.",
         "checkPlaylistOwnership compares userId and skips for ADMIN."
       ],
-      "priority": 13.1,
+      "priority": 490,
+      "effort": "low",
+      "passes": true,
+      "dependsOn": [
+        "STORY-security-001",
+        "STORY-security-002"
+      ],
+      "notes": "auto-split into 3 sub-stories",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004aa",
+      "title": "Define ownership types: TrackRecord, PlaylistRecord, CallerIdentity",
+      "description": "Add TrackRecord, PlaylistRecord, and CallerIdentity types to ownership.ts for structured resource and caller representations.",
+      "acceptanceCriteria": [
+        "TrackRecord has id and artistProfileId fields.",
+        "PlaylistRecord has id and userId fields.",
+        "CallerIdentity has userId, role, and optional artistProfileId fields."
+      ],
+      "priority": 490.1,
       "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-security-001",
         "STORY-security-002"
+      ],
+      "notes": "",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004ab",
+      "title": "Implement OwnershipError class with 403 status",
+      "description": "Create OwnershipError class with HTTP 403 status, error code, structured details, and owner hint.",
+      "acceptanceCriteria": [
+        "OwnershipError carries HTTP 403 status and structured error details.",
+        "OwnershipError includes resourceType, reason, and callerId fields.",
+        "OwnershipError is catchable via instance checks in route handlers."
+      ],
+      "priority": 490.2,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-004aa"
+      ],
+      "notes": "",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-security-004ac",
+      "title": "Add ownership check functions that throw OwnershipError",
+      "description": "Implement checkTrackOwnership and checkPlaylistOwnership functions using new types, throwing OwnershipError on failure with ADMIN override.",
+      "acceptanceCriteria": [
+        "checkTrackOwnership throws OwnershipError when artistProfileId does not match and caller is not ADMIN.",
+        "checkPlaylistOwnership throws OwnershipError when userId does not match and caller is not ADMIN.",
+        "ADMIN role bypasses ownership checks for both Track and Playlist."
+      ],
+      "priority": 490.3,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-security-004ab"
       ],
       "notes": "",
       "model": "deepseek"
@@ -879,7 +968,7 @@
         "Playlist ownership tests cover admin bypass, matching user, and mismatch cases.",
         "OwnershipError defaults statusCode to 403 with correct shape."
       ],
-      "priority": 13.2,
+      "priority": 500,
       "effort": "low",
       "passes": false,
       "dependsOn": [
@@ -897,7 +986,7 @@
         "Unauthorized playlist access returns HTTP 403 with ERR_RESOURCE_OWNERSHIP_DENIED code.",
         "ADMIN role successfully accesses another user's track and playlist."
       ],
-      "priority": 13.3,
+      "priority": 510,
       "effort": "low",
       "passes": false,
       "dependsOn": [
@@ -917,7 +1006,7 @@
         "Unit tests in tests/unit/security/wrappers.test.ts verify AuthContext injection and role boundary validation.",
         "Integration tests confirm 401 error envelope format when calling wrapped endpoints without valid session headers."
       ],
-      "priority": 14,
+      "priority": 520,
       "passes": false,
       "dependsOn": [
         "STORY-security-002",
@@ -939,7 +1028,7 @@
         "Unit tests mock AWS SDK calls to test presigned URL creation, metadata reading, and object deletion.",
         "Integration tests against mock S3 storage verify presigned upload token generation and metadata retrieval."
       ],
-      "priority": 15,
+      "priority": 530,
       "passes": false,
       "dependsOn": [
         "STORY-setup-005"
@@ -960,7 +1049,7 @@
         "Valid requests return HTTP 200 OK with a 60-minute presigned PUT URL and deterministic object key (audio/{artistId}/{trackId}_{uuid}.{ext} or images/{artistId}/{imageId}_{uuid}.webp).",
         "Integration test verifies POST /api/v1/storage/upload-intent with valid and invalid audio payloads."
       ],
-      "priority": 16,
+      "priority": 540,
       "passes": false,
       "dependsOn": [
         "STORY-storage-001",
@@ -982,7 +1071,7 @@
         "Unit tests verify stream URL generation and expiry configuration.",
         "Integration test calls GET /api/v1/tracks/:id/stream and verifies response headers and presigned stream URL payload."
       ],
-      "priority": 17,
+      "priority": 550,
       "passes": false,
       "dependsOn": [
         "STORY-storage-001",
@@ -1005,7 +1094,7 @@
         "Unit tests in tests/unit/components/upload.test.tsx test hook states and upload validation.",
         "Playwright E2E spec in e2e/tests/upload-flow.spec.ts verifies selecting an audio file, observing progress, and completing direct upload."
       ],
-      "priority": 18,
+      "priority": 560,
       "passes": false,
       "dependsOn": [
         "STORY-storage-002",
@@ -1028,7 +1117,7 @@
         "Passwords are sanitized out of response payloads and never logged per constraint 4 and sec-024 rules.",
         "Integration test asserts POST /api/v1/auth/register creates user, sets session cookie, and returns sanitized envelope."
       ],
-      "priority": 19,
+      "priority": 570,
       "passes": false,
       "dependsOn": [
         "STORY-security-001",
@@ -1050,7 +1139,7 @@
         "Password inputs and failure attempts do not output plaintext credentials to application loggers per constraint 4.",
         "Integration test verifies successful login cookie issuance, 401 error envelope on invalid credentials, and 429 rate limit triggering after 5 failed attempts."
       ],
-      "priority": 20,
+      "priority": 580,
       "passes": false,
       "dependsOn": [
         "STORY-security-001",
@@ -1071,7 +1160,7 @@
         "Password reset tokens and updated hashes use UTC ISO-8601 expiration timestamps per constraint 0.",
         "Integration tests cover forgot password uniform response, reset password execution, token expiry rejection, and credential update logic."
       ],
-      "priority": 21,
+      "priority": 590,
       "passes": false,
       "dependsOn": [
         "STORY-auth-001",
@@ -1091,7 +1180,7 @@
         "Data in transit is enforced over TLS 1.3 encrypted connections per sec-025.",
         "Unit tests in tests/unit/middleware/sanitizer.test.ts verify payload redaction across various nested JSON structures."
       ],
-      "priority": 22,
+      "priority": 600,
       "passes": false,
       "dependsOn": [
         "STORY-setup-006",
@@ -1112,7 +1201,7 @@
         "Unit tests verify guest state extraction and payload formatting.",
         "Integration test validates converting a guest playlist payload into a persisted Playlist entity."
       ],
-      "priority": 23,
+      "priority": 610,
       "passes": false,
       "dependsOn": [
         "STORY-auth-001",
@@ -1135,7 +1224,7 @@
         "Unit tests verify form validation rules and component state transitions.",
         "Playwright E2E spec e2e/tests/register.spec.ts covers successful registration, duplicate email handling, and validation error display."
       ],
-      "priority": 24,
+      "priority": 620,
       "passes": false,
       "dependsOn": [
         "STORY-auth-001",
@@ -1158,7 +1247,7 @@
         "Unit tests verify login form states and submit event handling.",
         "Playwright E2E spec e2e/tests/login.spec.ts tests valid login flow, invalid credentials error, and guest migration trigger."
       ],
-      "priority": 25,
+      "priority": 630,
       "passes": false,
       "dependsOn": [
         "STORY-auth-002",
@@ -1181,7 +1270,7 @@
         "Unit tests verify form schema validation and token state handling.",
         "Playwright E2E spec e2e/tests/password-reset.spec.ts verifies full password recovery user flow from forgot-password submission to reset-password update."
       ],
-      "priority": 26,
+      "priority": 640,
       "passes": false,
       "dependsOn": [
         "STORY-auth-003",
@@ -1203,7 +1292,7 @@
         "Unit tests in src/services/role.test.ts verify atomic role update and default stageName fallback logic.",
         "Integration test calls POST /api/v1/users/me/upgrade-to-artist with valid payload and asserts HTTP 200 plus correct database state."
       ],
-      "priority": 27,
+      "priority": 650,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -1225,7 +1314,7 @@
         "Unit tests in src/services/emailVerification.test.ts cover token generation, SHA-256 hashing, and prior token invalidation.",
         "Integration test calls POST /api/v1/auth/verify-email/request for an authenticated user and asserts HTTP 202 status and DB record."
       ],
-      "priority": 28,
+      "priority": 660,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -1247,7 +1336,7 @@
         "Unit tests in src/services/emailVerificationConfirm.test.ts cover valid token processing, expired token rejection, and invalid digest matching.",
         "Integration test calls POST /api/v1/auth/verify-email/confirm with valid and invalid tokens and verifies exact HTTP responses."
       ],
-      "priority": 29,
+      "priority": 670,
       "passes": false,
       "dependsOn": [
         "STORY-role-002"
@@ -1268,7 +1357,7 @@
         "Unit tests in src/middleware/requireVerifiedEmail.test.ts verify passthrough for verified users and rejection for unverified accounts.",
         "Integration test verifies that POST /api/v1/tracks returns 403 when invoked by an unverified account."
       ],
-      "priority": 30,
+      "priority": 680,
       "passes": false,
       "dependsOn": [
         "STORY-role-003",
@@ -1290,7 +1379,7 @@
         "Unit tests in src/components/ArtistUpgradeForm.test.tsx verify field validation, submission handling, and accessibility attributes.",
         "Playwright spec in e2e/tests/artist-upgrade.spec.ts covers filling out the upgrade form, submitting, and verifying updated role state."
       ],
-      "priority": 31,
+      "priority": 690,
       "passes": false,
       "dependsOn": [
         "STORY-role-001",
@@ -1312,7 +1401,7 @@
         "Unit tests in src/pages/VerifyEmail.test.tsx verify token extraction, API invocation states, and error handling UI.",
         "Playwright spec in e2e/tests/email-verification.spec.ts tests visiting /verify-email with valid and expired tokens."
       ],
-      "priority": 32,
+      "priority": 700,
       "passes": false,
       "dependsOn": [
         "STORY-role-003",
@@ -1334,7 +1423,7 @@
         "Unit tests in src/services/artistProfile.test.ts cover aggregation calculations, popular track selection, and guest request handling.",
         "Integration test calls GET /api/v1/artists/:artistId and verifies response schema, stats accuracy, and 200 HTTP status."
       ],
-      "priority": 33,
+      "priority": 710,
       "passes": false,
       "dependsOn": [
         "STORY-role-001",
@@ -1356,7 +1445,7 @@
         "Unit tests in src/validators/artistProfile.test.ts verify field validation rules and error payload generation.",
         "Integration test executes PATCH /api/v1/artist-profile with valid and invalid payloads and verifies responses."
       ],
-      "priority": 34,
+      "priority": 720,
       "passes": false,
       "dependsOn": [
         "STORY-role-001",
@@ -1378,7 +1467,7 @@
         "Unit tests in src/services/profileImageUpload.test.ts cover file type validation, size checking, and storage provider invocation.",
         "Integration test posts image files to avatar/header endpoints and asserts HTTP 200 status and updated profile fields."
       ],
-      "priority": 35,
+      "priority": 730,
       "passes": false,
       "dependsOn": [
         "STORY-profile-002",
@@ -1400,7 +1489,7 @@
         "Unit tests in src/services/listenerProfile.test.ts verify filtering of private playlists and proper profile serialization.",
         "Integration test calls GET /api/v1/users/:userId and asserts HTTP 200 response with correct public data."
       ],
-      "priority": 36,
+      "priority": 740,
       "passes": false,
       "dependsOn": [
         "STORY-setup-008"
@@ -1420,7 +1509,7 @@
         "Unit tests in src/middleware/statusIsolation.test.ts cover profile 404 responses for suspended and banned user states.",
         "Integration test verifies that querying a suspended artist's profile route returns a standardized 404 error envelope."
       ],
-      "priority": 37,
+      "priority": 750,
       "passes": false,
       "dependsOn": [
         "STORY-profile-001",
@@ -1443,7 +1532,7 @@
         "Unit tests in src/pages/ArtistProfileView.test.tsx cover header rendering, stats formatting, track list sorting, and follow button interaction.",
         "Playwright spec in e2e/tests/artist-profile.spec.ts verifies visiting /artists/[artistId], interacting with play triggers, and sorting discography."
       ],
-      "priority": 38,
+      "priority": 760,
       "passes": false,
       "dependsOn": [
         "STORY-profile-001",
@@ -1465,7 +1554,7 @@
         "Unit tests in src/components/ArtistProfileEditor.test.tsx test preview generation, char counter math, and form submission.",
         "Playwright spec in e2e/tests/artist-profile-edit.spec.ts covers modifying bio text, selecting avatar image, and saving profile changes."
       ],
-      "priority": 39,
+      "priority": 770,
       "passes": false,
       "dependsOn": [
         "STORY-profile-002",
@@ -1488,7 +1577,7 @@
         "Unit tests in src/pages/ListenerProfileView.test.tsx verify playlist grid rendering and followed artists carousel structure.",
         "Playwright spec in e2e/tests/listener-profile.spec.ts tests loading a listener profile page and clicking a public playlist card."
       ],
-      "priority": 40,
+      "priority": 780,
       "passes": false,
       "dependsOn": [
         "STORY-profile-004",
@@ -1510,7 +1599,7 @@
         "Unit tests in src/services/uploadIntent.test.ts verify MIME type validation, file size checks, and presigned URL parameters.",
         "Integration test calls POST /api/v1/tracks/upload-intent with valid payload and asserts response key formats and 200 status."
       ],
-      "priority": 41,
+      "priority": 790,
       "passes": false,
       "dependsOn": [
         "STORY-role-004",
@@ -1532,7 +1621,7 @@
         "Unit tests in src/services/audioMetadata.test.ts cover valid MP3/WAV header parsing and corrupted file detection.",
         "Integration test executes metadata extraction against sample audio files in local test storage."
       ],
-      "priority": 42,
+      "priority": 800,
       "passes": false,
       "dependsOn": [
         "STORY-storage-001"
@@ -1554,7 +1643,7 @@
         "Unit tests in src/services/trackRegistration.test.ts verify auto-live assignment, default cover art fallback, and metadata persistence.",
         "Integration test calls POST /api/v1/tracks with valid keys and asserts 201 status and DB Track record."
       ],
-      "priority": 43,
+      "priority": 810,
       "passes": false,
       "dependsOn": [
         "STORY-track-001",
@@ -1575,7 +1664,7 @@
         "Unit tests in src/services/genreIndexing.test.ts cover taxonomy validation and indexing event payload creation.",
         "Integration test verifies that creating a track fires the expected search indexing event trigger."
       ],
-      "priority": 44,
+      "priority": 820,
       "passes": false,
       "dependsOn": [
         "STORY-track-003"
@@ -1596,7 +1685,7 @@
         "Unit tests in src/services/uploadErrorRecovery.test.ts verify storage deletion invocation and error envelope generation.",
         "Integration test simulates corrupted file header and verifies storage cleanup execution and 422 response."
       ],
-      "priority": 45,
+      "priority": 830,
       "passes": false,
       "dependsOn": [
         "STORY-track-003",
@@ -1619,7 +1708,7 @@
         "Unit tests in src/components/TrackUploadWizard.test.tsx test file drag-and-drop validation, upload progress calculation, and form submission.",
         "Playwright spec in e2e/tests/track-upload.spec.ts tests picking an MP3 file, filling metadata, uploading, and verifying redirect to published track view."
       ],
-      "priority": 46,
+      "priority": 840,
       "passes": false,
       "dependsOn": [
         "STORY-track-001",
@@ -1644,7 +1733,7 @@
         "Admin-initiated metadata edits emit an immutable entry to AuditLog capturing admin user ID, track ID, and modified fields.",
         "Integration tests in tests/api/track-update.test.ts call PATCH /api/v1/tracks/[id] with valid owner payload (asserts 200), immutable payload (asserts 422), unauthorized user (asserts 403), and non-existent track (asserts 404)."
       ],
-      "priority": 47,
+      "priority": 850,
       "passes": false,
       "dependsOn": [
         "STORY-setup-006",
@@ -1666,7 +1755,7 @@
         "Storage provider deletion failures are logged as structured errors and retried without blocking or failing the HTTP PATCH response.",
         "Unit tests in tests/unit/cover-art-cleanup.test.ts verify that StorageProvider.deleteFile() is called with the exact previous key when coverImageUrl changes."
       ],
-      "priority": 48,
+      "priority": 860,
       "passes": false,
       "dependsOn": [
         "STORY-track-007",
@@ -1688,7 +1777,7 @@
         "Admin track soft-deletion emits an entry to AuditLog capturing admin ID, track ID, and timestamp.",
         "Integration tests in tests/api/track-delete.test.ts verify soft-archival database state, 404 response on streaming archived track, and 403 on unauthorized deletion."
       ],
-      "priority": 49,
+      "priority": 870,
       "passes": false,
       "dependsOn": [
         "STORY-setup-006",
@@ -1712,7 +1801,7 @@
         "Invalidates cache tags for affected playlists and artist catalog listings.",
         "Integration tests in tests/services/playlist-cascade.test.ts assert PlaylistTrack purge, position re-indexing without gaps, and accurate trackCount decrements on Playlist and ArtistProfile."
       ],
-      "priority": 50,
+      "priority": 880,
       "passes": false,
       "dependsOn": [
         "STORY-track-009"
@@ -1733,7 +1822,7 @@
         "Preserves database record in archived state for analytical history while confirming storage objects are purged.",
         "Unit and integration tests in tests/jobs/track-media-purge.test.ts verify worker invocation, target storage key deletion calls, and error retry handling."
       ],
-      "priority": 51,
+      "priority": 890,
       "passes": false,
       "dependsOn": [
         "STORY-track-009",
@@ -1755,7 +1844,7 @@
         "Modal and form elements satisfy WCAG 2.1 AA accessibility guidelines (keyboard focus trapping, ARIA dialog labels, visible focus rings).",
         "Playwright spec in e2e/tests/artist-catalog-edit.spec.ts verifies opening edit modal, modifying title and genre, submitting valid form, and asserting updated UI listing."
       ],
-      "priority": 52,
+      "priority": 900,
       "passes": false,
       "dependsOn": [
         "STORY-track-007",
@@ -1777,7 +1866,7 @@
         "Confirmation dialog and player alerts comply with WCAG 2.1 AA keyboard accessibility and screen reader announcement standards (aria-live).",
         "Playwright spec in e2e/tests/artist-catalog-delete.spec.ts covers deletion dialog confirmation, catalog item removal, and player toast notification trigger on active track deletion."
       ],
-      "priority": 53,
+      "priority": 910,
       "passes": false,
       "dependsOn": [
         "STORY-track-009",
@@ -1800,7 +1889,7 @@
         "Unit tests in context/AudioPlayerContext.test.tsx verify state transitions, event subscriptions, and sessionStorage serialization.",
         "Playwright spec in e2e/tests/player-persistence.spec.ts verifies player state remains active across client-side page route navigation."
       ],
-      "priority": 54,
+      "priority": 920,
       "passes": false,
       "dependsOn": [
         "STORY-setup-002",
@@ -1823,7 +1912,7 @@
         "Disabling shuffle restores activeQueue to originalQueue while matching currentIndex to the currently active track.",
         "Unit tests in utils/queueEngine.test.ts cover queue insertion, reordering, Fisher-Yates shuffle integrity, and repeat mode boundary conditions."
       ],
-      "priority": 55,
+      "priority": 930,
       "passes": false,
       "dependsOn": [
         "STORY-player-001"
@@ -1846,7 +1935,7 @@
         "Component unit tests in components/player/AudioPlayerBar.test.tsx verify play/pause toggles, volume scaling, seek events, and error UI states.",
         "Playwright spec in e2e/tests/player-bar.spec.ts verifies audio playback controls and volume persistence."
       ],
-      "priority": 56,
+      "priority": 940,
       "passes": false,
       "dependsOn": [
         "STORY-player-001"
@@ -1868,7 +1957,7 @@
         "Component unit tests in components/player/QueueDrawer.test.tsx verify render list, drag reordering triggers, and clear queue button actions.",
         "Playwright spec in e2e/tests/queue-drawer.spec.ts verifies opening the drawer, reordering items, and removing tracks."
       ],
-      "priority": 57,
+      "priority": 950,
       "passes": false,
       "dependsOn": [
         "STORY-player-002",
@@ -1892,7 +1981,7 @@
         "Unit tests in hooks/useMediaSession.test.tsx and hooks/usePlayerHotkeys.test.tsx cover event binding and input suppression logic.",
         "Playwright spec in e2e/tests/player-accessibility.spec.ts verifies hotkey execution and ARIA slider attributes."
       ],
-      "priority": 58,
+      "priority": 960,
       "passes": false,
       "dependsOn": [
         "STORY-player-001",
@@ -1914,7 +2003,7 @@
         "Unit tests in components/player/GuestAuthInterceptor.test.tsx verify social action interception for guests.",
         "Playwright spec in e2e/tests/guest-playback.spec.ts verifies unauthenticated track playback and auth modal trigger."
       ],
-      "priority": 59,
+      "priority": 970,
       "passes": false,
       "dependsOn": [
         "STORY-player-001",
@@ -1937,7 +2026,7 @@
         "Service unit tests verify calculation of threshold for tracks < 60s and >= 60s and HMAC token signature validity.",
         "Integration test calls POST /api/v1/tracks/:id/play-session with valid trackId and asserts 200 status and PlaySessionResponse body schema."
       ],
-      "priority": 60,
+      "priority": 980,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -1960,7 +2049,7 @@
         "If qualified, returns 200 OK with status 'QUALIFIED' and playCountIncremented: true.",
         "Integration test calls POST /api/v1/tracks/:id/play-beacon with valid token, expired token, early payload, and duplicate play within 60m to assert status codes."
       ],
-      "priority": 61,
+      "priority": 990,
       "passes": false,
       "dependsOn": [
         "STORY-listen-001"
@@ -1981,7 +2070,7 @@
         "Unit tests in services/playCountAggregator.test.tsx verify atomic track counter increments and background worker batch aggregations.",
         "Integration test verifies calling play-beacon increments Track.playCount immediately and ArtistProfile.totalPlays after background worker execution."
       ],
-      "priority": 62,
+      "priority": 1000,
       "passes": false,
       "dependsOn": [
         "STORY-listen-002"
@@ -2002,7 +2091,7 @@
         "Unit tests in hooks/useListenThreshold.test.tsx verify accumulation timer logic, pause/mute exclusion, seek handling, and beacon dispatch.",
         "Playwright spec in e2e/tests/listen-threshold.spec.ts verifies playing a track for 30 seconds triggers the play-beacon network call."
       ],
-      "priority": 63,
+      "priority": 1010,
       "passes": false,
       "dependsOn": [
         "STORY-player-001",
@@ -2025,7 +2114,7 @@
         "Unit tests in src/services/playlist.service.test.ts cover valid playlist creation and title character validation errors.",
         "Integration test calls POST /api/v1/playlists with valid JWT and asserts 201 Created and response payload structure."
       ],
-      "priority": 64,
+      "priority": 1020,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -2048,7 +2137,7 @@
         "Unit tests verify ownership assertion helper with matching and non-matching user IDs.",
         "Integration test asserts PATCH and DELETE endpoints enforce 403 for non-owners and 200 for valid owners."
       ],
-      "priority": 65,
+      "priority": 1030,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-001",
@@ -2071,7 +2160,7 @@
         "Unit tests in src/services/playlist-track.service.test.ts cover position recalculations and duration counter updates.",
         "Integration test asserts POST and DELETE track endpoints execute correct DB state changes and response structures."
       ],
-      "priority": 66,
+      "priority": 1040,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-002",
@@ -2094,7 +2183,7 @@
         "Unit tests cover edge cases including moving top track to bottom, bottom track to top, and no-op identical position movement.",
         "Integration test calls PUT /api/v1/playlists/:id/tracks/reorder and verifies resulting dense sequential order in database."
       ],
-      "priority": 67,
+      "priority": 1050,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-003"
@@ -2115,7 +2204,7 @@
         "Component unit tests cover drag handle rendering and keyboard accessibility menu interactions.",
         "Playwright spec in e2e/tests/playlist-editor.spec.ts verifies drag reordering, position prompt modal, and failure rollback."
       ],
-      "priority": 68,
+      "priority": 1060,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-004",
@@ -2136,7 +2225,7 @@
         "Unit tests verify share URL construction from environment domain configuration and playlist ID.",
         "Integration test asserts PATCH /api/v1/playlists/:id/visibility updates isPublic flag in DB and returns 200 OK."
       ],
-      "priority": 69,
+      "priority": 1070,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-002"
@@ -2157,7 +2246,7 @@
         "Unit tests in src/services/playlist-access.test.ts verify public vs private permission matrix enforcement.",
         "Integration tests assert GET /api/v1/playlists/:id returns 200 for public/owner requests and 404 for unauthorized private requests."
       ],
-      "priority": 70,
+      "priority": 1080,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-006"
@@ -2177,7 +2266,7 @@
         "Unit test verifies OG image composition logic and composite image generation parameters.",
         "Integration test calls GET /api/v1/playlists/:id/og-image and asserts 200 OK with image/png or image/jpeg content type."
       ],
-      "priority": 71,
+      "priority": 1090,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-007"
@@ -2198,7 +2287,7 @@
         "Component unit tests verify playlist metadata rendering and queue initialization hooks.",
         "Playwright spec in e2e/tests/public-playlist.spec.ts verifies unauthenticated playlist viewing and audio playback triggering."
       ],
-      "priority": 72,
+      "priority": 1100,
       "passes": false,
       "dependsOn": [
         "STORY-playlist-007",
@@ -2219,7 +2308,7 @@
         "Database index setup script initializes text and filter indexes without error or service disruption.",
         "Unit tests verify index schema definitions and compound key configurations against target database specifications."
       ],
-      "priority": 73,
+      "priority": 1110,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004"
@@ -2242,7 +2331,7 @@
         "Integration test calls GET /api/v1/search with valid search queries and asserts 200 OK status, grouped payload structure, and correct filtering/sorting behavior.",
         "Unit tests in search.service.test.ts cover query sanitization, tokenization, stop-word removal, and score tie-breaking logic."
       ],
-      "priority": 74,
+      "priority": 1120,
       "passes": false,
       "dependsOn": [
         "STORY-search-001",
@@ -2265,7 +2354,7 @@
         "Unit tests verify input debounce timing, overlay visibility state triggers, and query length threshold gating.",
         "Playwright spec in e2e/tests/search-bar.spec.ts verifies user typing, debounced suggestion popup, keyboard navigation, and selection click navigation."
       ],
-      "priority": 75,
+      "priority": 1130,
       "passes": false,
       "dependsOn": [
         "STORY-search-002",
@@ -2288,7 +2377,7 @@
         "Unit tests cover URL query parameter synchronization, tab switching, and filter state updates.",
         "Playwright spec in e2e/tests/search-page.spec.ts verifies entity tab switching, genre filter application, sort order changes, and playing a track directly from search results."
       ],
-      "priority": 76,
+      "priority": 1140,
       "passes": false,
       "dependsOn": [
         "STORY-search-002",
@@ -2313,7 +2402,7 @@
         "All timestamp fields (Like.createdAt) are returned in UTC ISO-8601 format. (Constraint 0)",
         "Integration test calls POST and DELETE endpoints with valid session tokens and asserts database counter mutations and idempotent responses."
       ],
-      "priority": 77,
+      "priority": 1150,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -2338,7 +2427,7 @@
         "All returned track timestamps conform to UTC ISO-8601 format. (Constraint 0)",
         "Integration test verifies authenticating as a user with liked tracks, validating pagination offset limits and correct sorting order."
       ],
-      "priority": 78,
+      "priority": 1160,
       "passes": false,
       "dependsOn": [
         "STORY-like-001",
@@ -2358,7 +2447,7 @@
         "Track list queries execute batched Like lookup queries indexed by [userId, trackId] to prevent N+1 database queries.",
         "Integration test verifies that track listing endpoints return accurate hasLiked boolean flags for authenticated vs unauthenticated session tokens."
       ],
-      "priority": 79,
+      "priority": 1170,
       "passes": false,
       "dependsOn": [
         "STORY-like-001",
@@ -2379,7 +2468,7 @@
         "Component supports interactive states (hover, focus, active, loading) conforming to design system tokens and WCAG 2.1 AA accessibility guidelines with aria-label attributes. (sec-026, Constraint 5)",
         "Unit tests in components/like-button.test.tsx verify optimistic state toggling, rollback handling on API failure, and accessibility attributes."
       ],
-      "priority": 80,
+      "priority": 1180,
       "passes": false,
       "dependsOn": [
         "STORY-like-001",
@@ -2400,7 +2489,7 @@
         "Page layout is responsive across desktop, tablet, and mobile viewports down to 375px width. (sec-024, sec-026)",
         "Playwright spec in e2e/tests/liked-tracks.spec.ts covers navigating to Liked Tracks page, triggering Play All, unliking a track, and verifying queue population."
       ],
-      "priority": 81,
+      "priority": 1190,
       "passes": false,
       "dependsOn": [
         "STORY-like-002",
@@ -2424,7 +2513,7 @@
         "Follow write endpoints enforce rate limiting policy per sec-025.",
         "Unit tests cover follow validation logic and transactional counter increments, while integration tests verify POST and DELETE /api/v1/artists/:artistId/follow HTTP responses and status codes."
       ],
-      "priority": 82,
+      "priority": 1200,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -2447,7 +2536,7 @@
         "API endpoint responds within SLA targets per sec-024 performance guidelines.",
         "Unit tests cover count drift reconciliation logic and integration tests assert GET /api/v1/artists/:artistId/follow-status response structure and unauthenticated 401 status."
       ],
-      "priority": 83,
+      "priority": 1210,
       "passes": false,
       "dependsOn": [
         "STORY-follow-001"
@@ -2468,7 +2557,7 @@
         "Supports limit query parameter defaulted to 20 with a hard maximum cap of 100 items per page.",
         "Unit tests cover feed query building and pagination cursor logic, and integration tests verify GET /api/v1/feed/activity filtering, ordering, and payload schema."
       ],
-      "priority": 84,
+      "priority": 1220,
       "passes": false,
       "dependsOn": [
         "STORY-follow-001",
@@ -2490,7 +2579,7 @@
         "Button states and focus styles comply with WCAG 2.1 AA keyboard and screen reader accessibility guidelines per constraint 5 and sec-024.",
         "Component unit tests verify optimistic state mutations and error rollbacks, while Playwright spec in e2e/tests/follow-button.spec.ts tests user interaction, optimistic update, and network error recovery."
       ],
-      "priority": 85,
+      "priority": 1230,
       "passes": false,
       "dependsOn": [
         "STORY-follow-001",
@@ -2513,7 +2602,7 @@
         "Implements infinite scrolling via IntersectionObserver cursor fetch adhering to design system patterns per sec-026.",
         "Playwright spec in e2e/tests/activity-feed.spec.ts covers authenticated page access, infinite scroll loading, player playback integration, and empty state rendering."
       ],
-      "priority": 86,
+      "priority": 1240,
       "passes": false,
       "dependsOn": [
         "STORY-follow-003",
@@ -2535,7 +2624,7 @@
         "Calculated affinity vector is cached in memory per request lifecycle to avoid redundant database reads.",
         "Unit tests in src/services/recommendation-affinity.test.ts cover affinity score calculation, 90-day cutoff boundary filtering, and weight aggregation."
       ],
-      "priority": 87,
+      "priority": 1250,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -2557,7 +2646,7 @@
         "applyArtistDiversity algorithm re-orders candidate tracks using a minimum buffer of 2 positions to prevent identical artist IDs from appearing consecutively.",
         "Unit tests in src/services/recommendation-interleaving.test.ts cover played track exclusion, soft-hidden filtering, and artist interleaving edge cases."
       ],
-      "priority": 88,
+      "priority": 1260,
       "passes": false,
       "dependsOn": [
         "STORY-recommend-001"
@@ -2577,7 +2666,7 @@
         "Falls back to the 50 most recently published live tracks if genre aggregates are empty or sparse.",
         "Unit tests in src/services/recommendation-coldstart.test.ts cover guest fallback, empty history handling, and trending velocity calculations."
       ],
-      "priority": 89,
+      "priority": 1270,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004"
@@ -2598,7 +2687,7 @@
         "Endpoint response latency resolves within sub-50ms under baseline load.",
         "Integration test calls GET /api/v1/recommendations with valid session cookie and guest headers, asserting response status 200 and schema validity."
       ],
-      "priority": 90,
+      "priority": 1280,
       "passes": false,
       "dependsOn": [
         "STORY-recommend-001",
@@ -2622,7 +2711,7 @@
         "Interactive elements (genre pills, play buttons) comply with WCAG 2.1 AA keyboard navigation and focus ring standards.",
         "Playwright spec in e2e/tests/recommendations.spec.ts verifies feed rendering, genre pill filtering, cold-start indicator display, and track playback trigger."
       ],
-      "priority": 91,
+      "priority": 1290,
       "passes": false,
       "dependsOn": [
         "STORY-recommend-004",
@@ -2646,7 +2735,7 @@
         "Timestamps in the created Report entity are stored in UTC ISO-8601 format per constraint 0.",
         "Integration test in tests/api/reports.test.ts verifies successful creation, 404 missing track, 409 duplicate submission, and 429 rate limit enforcement."
       ],
-      "priority": 92,
+      "priority": 1300,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -2670,7 +2759,7 @@
         "Styled using dark-mode HSL design tokens and shadcn/ui Dialog/Select components per sec-026.",
         "Unit tests in components/ReportModal.test.tsx cover form validation and state transitions; Playwright spec in e2e/tests/report-modal.spec.ts verifies opening, submitting, auto-dismissing, and error alerts."
       ],
-      "priority": 93,
+      "priority": 1310,
       "passes": false,
       "dependsOn": [
         "STORY-report-001",
@@ -2692,7 +2781,7 @@
         "Computes slaRemainingSeconds (172800 seconds minus elapsed time since createdAt) and sets isSlaBreached = true if slaRemainingSeconds <= 0.",
         "Integration test in tests/api/admin-reports.test.ts asserts 401/403 guards for unauthorized users, 200 OK payload schema, pagination parameters, and SLA calculation accuracy."
       ],
-      "priority": 94,
+      "priority": 1320,
       "passes": false,
       "dependsOn": [
         "STORY-report-001",
@@ -2715,7 +2804,7 @@
         "Both endpoints write an immutable AuditLog entry recording adminId, action (REPORT_APPROVED_UNPUBLISH or REPORT_REJECTED_DISMISS), targetEntityId, adminNotes, and duration in milliseconds per sec-025.",
         "Integration test in tests/api/admin-takedown.test.ts verifies atomic status transitions, AuditLog creation, and presigned stream URL HTTP 404 rejection post-takedown."
       ],
-      "priority": 95,
+      "priority": 1330,
       "passes": false,
       "dependsOn": [
         "STORY-moderation-001",
@@ -2739,7 +2828,7 @@
         "Page responsive layout supports viewports down to desktop/tablet screens using design system tokens per sec-026.",
         "Unit test in pages/admin/moderation.test.tsx verifies table filtering and badge rendering; Playwright spec in e2e/tests/admin-moderation.spec.ts tests complete report approval and rejection workflows."
       ],
-      "priority": 96,
+      "priority": 1340,
       "passes": false,
       "dependsOn": [
         "STORY-moderation-002",
@@ -2761,7 +2850,7 @@
         "Passwords and password hashes are strictly excluded from response payloads per constraint 4.",
         "Integration test in tests/api/admin-users.test.ts verifies pagination, filtering by role/status, partial email search matching, and admin permission enforcement."
       ],
-      "priority": 97,
+      "priority": 1350,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004",
@@ -2784,7 +2873,7 @@
         "Writes a synchronous AuditLog record containing action (USER_SUSPENDED, USER_BANNED, or USER_REINSTATED), adminId, targetUserId, previousStatus, newStatus, reason, and metadata per sec-025.",
         "Integration test in tests/api/admin-user-status.test.ts verifies status transition, 403 on admin targeting, 422 on missing reason, AuditLog creation, and token invalidation timestamp update."
       ],
-      "priority": 98,
+      "priority": 1360,
       "passes": false,
       "dependsOn": [
         "STORY-usermod-001",
@@ -2807,7 +2896,7 @@
         "Retains user records, audio files, and playlist definitions indefinitely in database and cloud storage without hard deletion.",
         "Unit tests in services/visibilityEngine.test.ts and integration tests in tests/api/soft-hide.test.ts verify atomic flag updates, query filtering, and preservation of DMCA takedown states during reinstatement."
       ],
-      "priority": 99,
+      "priority": 1370,
       "passes": false,
       "dependsOn": [
         "STORY-usermod-002",
@@ -2831,7 +2920,7 @@
         "Responsive design and dark-mode styling built using shadcn/ui Table, Dialog, Select, and Badge components per sec-026.",
         "Unit tests in pages/admin/users.test.tsx verify table filtering and modal validation; Playwright spec in e2e/tests/admin-users.spec.ts tests user status updates and table search."
       ],
-      "priority": 100,
+      "priority": 1380,
       "passes": false,
       "dependsOn": [
         "STORY-usermod-003",
@@ -2853,7 +2942,7 @@
         "Unit tests in services/analyticsAggregation.test.ts verify metric calculation logic and idempotency when handling existing snapshot dates.",
         "Integration test in tests/api/cronAggregation.test.ts executes GET /api/v1/cron/aggregate-metrics with secret CRON auth header and verifies snapshot record persistence."
       ],
-      "priority": 101,
+      "priority": 1390,
       "passes": false,
       "dependsOn": [
         "STORY-setup-004"
@@ -2874,7 +2963,7 @@
         "Unit tests in services/analyticsSummary.test.ts verify growth percentage calculation algorithms including zero-division fallback edge cases.",
         "Integration tests in tests/api/adminSummaryAnalytics.test.ts assert GET /api/v1/admin/analytics/summary returns 200 with valid data envelope for Admin tokens and 403 for non-admin tokens."
       ],
-      "priority": 102,
+      "priority": 1400,
       "passes": false,
       "dependsOn": [
         "STORY-setup-007"
@@ -2894,7 +2983,7 @@
         "Unit tests in services/storageMetrics.test.ts verify correct byte aggregation logic across tracks and image resources.",
         "Integration test in tests/api/adminStorageAnalytics.test.ts asserts GET /api/v1/admin/analytics/storage returns 200 OK with expected JSON structure for authenticated Admin sessions."
       ],
-      "priority": 103,
+      "priority": 1410,
       "passes": false,
       "dependsOn": [
         "STORY-setup-007"
@@ -2915,7 +3004,7 @@
         "Unit tests in services/timeSeriesAnalytics.test.ts verify interval grouping and date range query filter construction.",
         "Integration tests in tests/api/adminTimeSeriesAnalytics.test.ts verify GET /api/v1/admin/analytics/time-series returns 200 with time-series data points spanning requested window."
       ],
-      "priority": 104,
+      "priority": 1420,
       "passes": false,
       "dependsOn": [
         "STORY-analytics-001"
@@ -2935,7 +3024,7 @@
         "Unit tests in services/moderationAnalytics.test.ts verify average resolution time math and 36-hour SLA warning threshold calculation.",
         "Integration tests in tests/api/adminModerationAnalytics.test.ts assert GET /api/v1/admin/analytics/moderation-stats returns 200 OK with accurate count metrics for Admin users."
       ],
-      "priority": 105,
+      "priority": 1430,
       "passes": false,
       "dependsOn": [
         "STORY-setup-007"
@@ -2957,7 +3046,7 @@
         "Unit tests in components/admin/AnalyticsDashboard.test.tsx verify metric card formatting, quota alert thresholds, and chart rendering states.",
         "Playwright spec in e2e/tests/admin-analytics.spec.ts verifies dashboard loading for Admin users, interactive time-series window switching, and 403 redirect state for non-admin users."
       ],
-      "priority": 106,
+      "priority": 1440,
       "passes": false,
       "dependsOn": [
         "STORY-analytics-002",
@@ -2981,7 +3070,7 @@
         "Response headers explicitly include Cache-Control: no-store, must-revalidate to prevent CDN caching of health status.",
         "Integration test calls GET /api/v1/health and asserts HTTP 200 status code and JSON schema validity."
       ],
-      "priority": 107,
+      "priority": 1450,
       "passes": false,
       "dependsOn": [
         "STORY-setup-008"
@@ -3002,7 +3091,7 @@
         "Containerized application starts cleanly and responds to GET /api/v1/health on port 3000.",
         "Unit tests verify next.config.js exports valid configuration settings."
       ],
-      "priority": 108,
+      "priority": 1460,
       "passes": false,
       "dependsOn": [
         "STORY-deploy-001"
@@ -3022,7 +3111,7 @@
         "CORS rules expose ETag headers and set MaxAgeSeconds to 3600 for presigned upload caching.",
         "Acceptance validation test verifies syntax and ARN scoping of IAM and CORS JSON policy definitions."
       ],
-      "priority": 109,
+      "priority": 1470,
       "passes": false,
       "dependsOn": [
         "STORY-deploy-002"
@@ -3041,7 +3130,7 @@
         "Dynamic application routes and API endpoints under /api/v1/* return Cache-Control: no-store, must-revalidate.",
         "Integration tests make requests to static asset paths and API endpoints, verifying correct Cache-Control header values."
       ],
-      "priority": 110,
+      "priority": 1480,
       "passes": false,
       "dependsOn": [
         "STORY-deploy-001"
@@ -3061,7 +3150,7 @@
         "Script verifies MongoDB collection index creation for User, Track, and AuditLog models.",
         "Integration test executes scripts/db-migrate.sh against a test MongoDB instance and asserts clean exit code 0."
       ],
-      "priority": 111,
+      "priority": 1490,
       "passes": false,
       "dependsOn": [
         "STORY-deploy-002"
@@ -3083,7 +3172,7 @@
         "Job `ecs-deploy` initiates ECS rolling update and monitors health via GET /api/v1/health over a 180-second evaluation window.",
         "Workflow YAML file syntax is validated clean against GitHub Actions schema guidelines."
       ],
-      "priority": 112,
+      "priority": 1500,
       "passes": false,
       "dependsOn": [
         "STORY-deploy-005"
