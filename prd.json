@@ -789,7 +789,7 @@
       ],
       "priority": 12.1,
       "effort": "medium",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-setup-007",
         "STORY-security-002"
