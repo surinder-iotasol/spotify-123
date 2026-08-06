@@ -1132,7 +1132,7 @@
         "Integration test verifies POST /api/v1/storage/upload-intent with valid and invalid audio payloads."
       ],
       "priority": 540,
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-storage-001",
         "STORY-security-005"
