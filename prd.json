@@ -1026,13 +1026,98 @@
         "Integration tests against mock S3 storage verify presigned upload token generation and metadata retrieval."
       ],
       "priority": 530,
+      "passes": true,
+      "dependsOn": [
+        "STORY-setup-005"
+      ],
+      "notes": "auto-split into 5 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-001a",
+      "title": "Define StorageProviderInterface and supporting types",
+      "description": "Define the StorageProviderInterface contract with upload, download, delete, and metadata methods. Add StorageConfig, UploadParams, PresignedUrlResult, SignedUrlOptions, and ObjectMetadata type declarations.",
+      "acceptanceCriteria": [
+        "StorageProviderInterface declares generatePresignedUploadUrl, generatePresignedDownloadUrl, deleteObject, and getObjectMetadata methods.",
+        "StorageConfig type includes bucket, region, endpoint, accessKeyId, and secretAccessKey.",
+        "PresignedUrlResult type exposes url, method, and expiresAt."
+      ],
+      "priority": 530.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-setup-005"
       ],
-      "notes": "",
+      "notes": ""
+    },
+    {
+      "id": "STORY-storage-001b",
+      "title": "Implement S3StorageProvider presigned URL generation",
+      "description": "Implement S3StorageProvider class using AWS SDK v3. support generatePresignedUploadUrl and generatePresignedDownloadUrl with configurable TTL capped at 3600 seconds.",
+      "acceptanceCriteria": [
+        "generatePresignedUploadUrl produces a valid presigned PUT URL with default 3600-second TTL.",
+        "generatePresignedDownloadUrl produces a valid presigned GET URL with TTL capped at 3600 seconds.",
+        "Both methods accept optional expiresIn parameter."
+      ],
+      "priority": 530.2,
       "effort": "medium",
-      "model": "deepseek"
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-001a"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-storage-001c",
+      "title": "Add object deletion and metadata retrieval methods",
+      "description": "Implement deleteObject and getObjectMetadata methods on S3StorageProvider using AWS SDK v3 DeleteObject and HeadObject commands respectively.",
+      "acceptanceCriteria": [
+        "deleteObject sends a DeleteObject request and resolves when the object is removed.",
+        "getObjectMetadata returns contentLength, contentType, and eTag from HeadObject response.",
+        "throw descriptive errors on AWS API failures."
+      ],
+      "priority": 530.3,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-001b"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-storage-001d",
+      "title": "Create storage provider factory with ENV selection",
+      "description": "Implement createStorageProvider factory that reads STORAGE_PROVIDER env var and returns the appropriate provider instance. S3 and R2 share the same client via endpoint configuration.",
+      "acceptanceCriteria": [
+        "createStorageProvider returns S3StorageProvider compatible with both S3 and R2 endpoints.",
+        "Factory passes through StorageConfig for endpoint-based provider selection.",
+        "Default to S3 configuration when STORAGE_PROVIDER is absent or invalid."
+      ],
+      "priority": 530.4,
+      "effort": "low",
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-001c"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "STORY-storage-001e",
+      "title": "Add unit tests for storage provider",
+      "description": "Mock AWS SDK calls to test presigned URL creation, metadata reading, and object deletion. Verify environment-based provider initialization.",
+      "acceptanceCriteria": [
+        "Unit tests mock SDK calls to verify presigned upload URL generation with correct method and TTL.",
+        "Unit tests mock SDK calls to verify presigned download URL with TTL cap enforcement.",
+        "Unit tests verify delete and metadata methods call correct SDK commands."
+      ],
+      "priority": 530.5,
+      "effort": "medium",
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-001d"
+      ],
+      "notes": ""
     },
     {
       "id": "STORY-storage-002",
