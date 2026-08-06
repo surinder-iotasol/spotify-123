@@ -1154,7 +1154,7 @@
         "Integration test calls GET /api/v1/tracks/:id/stream and verifies response headers and presigned stream URL payload."
       ],
       "priority": 550,
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-storage-001",
         "STORY-setup-004"
