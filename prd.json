@@ -1177,13 +1177,86 @@
         "Playwright E2E spec in e2e/tests/upload-flow.spec.ts verifies selecting an audio file, observing progress, and completing direct upload."
       ],
       "priority": 560,
+      "passes": true,
+      "dependsOn": [
+        "STORY-storage-002",
+        "STORY-setup-003"
+      ],
+      "notes": "auto-split into 4 sub-stories",
+      "effort": "medium",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-004a",
+      "title": "Scaffold upload hook directory structure and types",
+      "description": "Create src/lib/hooks directory with TypeScript types. Define ValidateResult interface, UploadState union type, and UseDirectUploadOptions interface.",
+      "acceptanceCriteria": [
+        "src/lib/hooks directory contains TypeScript type definitions for useDirectUpload hook.",
+        "UploadState type covers all six states: idle, validating, requesting, uploading, completed, error.",
+        "Exports are re-exported for clean module resolution."
+      ],
+      "priority": 560.1,
+      "effort": "low",
       "passes": false,
       "dependsOn": [
         "STORY-storage-002",
         "STORY-setup-003"
       ],
       "notes": "",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-004b",
+      "title": "Implement useDirectUpload hook and validateFile utility",
+      "description": "Build the React hook useDirectUpload that orchestrates client-side validation, presigned URL request, and direct S3/R2 PUT upload with progress tracking.",
+      "acceptanceCriteria": [
+        "hook validates audio MIME type and 50MB limit via validateFile before any network request.",
+        "hook requests presigned URL from /api/v1/storage/upload-intent and performs direct PUT upload.",
+        "hook exposes onProgress, onComplete, and onError callbacks and tracks six state transitions."
+      ],
+      "priority": 560.2,
       "effort": "medium",
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-004a"
+      ],
+      "notes": "",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-004c",
+      "title": "Build FileUploadProgress UI component",
+      "description": "Create FileUploadProgress component displaying real-time upload progress bar, percentage, error notifications, and responsive layout.",
+      "acceptanceCriteria": [
+        "Component renders a progress bar, transfer percentage text, and error messages using design tokens.",
+        "Progress bar and controls satisfy WCAG 2.1 AA keyboard and screen reader accessibility requirements.",
+        "Layout scales down gracefully to 375px mobile viewports."
+      ],
+      "priority": 560.3,
+      "effort": "medium",
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-004b"
+      ],
+      "notes": "",
+      "model": "deepseek"
+    },
+    {
+      "id": "STORY-storage-004d",
+      "title": "Write unit and E2E tests for upload flow",
+      "description": "Create unit tests testing hook states and validation, and Playwright E2E spec verifying end-to-end audio file upload with progress observation.",
+      "acceptanceCriteria": [
+        "tests/unit/components/upload.test.tsx tests all hook states (idle, validating, uploading, completed, error).",
+        "tests validateFile covers size limit rejections, MIME type checks, and success path.",
+        "e2e/tests/upload-flow.spec.ts verifies selecting an audio file, observing progress, and completing direct upload."
+      ],
+      "priority": 560.4,
+      "effort": "medium",
+      "passes": false,
+      "dependsOn": [
+        "STORY-storage-004c"
+      ],
+      "notes": "",
       "model": "deepseek"
     },
     {
