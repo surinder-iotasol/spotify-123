@@ -1,0 +1,155 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: tests/upload-flow.spec.ts >> upload-intent API >> rejects invalid fileType
+- Location: e2e/tests/upload-flow.spec.ts:143:7
+
+# Error details
+
+```
+TypeError: page.request is not a function
+```
+
+# Test source
+
+```ts
+  44  |       data: {
+  45  |         fileType: "audio",
+  46  |         fileName: "track.wav",
+  47  |         fileSizeBytes: 3_000_000,
+  48  |         mimeType: "audio/wav",
+  49  |         artistId: "a",
+  50  |         resourceId: "r",
+  51  |       },
+  52  |     });
+  53  | 
+  54  |     expect(response.status()).toBe(200);
+  55  |     expect((await response.json()).success).toBe(true);
+  56  |   });
+  57  | 
+  58  |   test("returns 200 for valid JPG image below cap", async ({ page }) => {
+  59  |     const response = await page.request().post("/api/v1/storage/upload-intent", {
+  60  |       data: {
+  61  |         fileType: "image",
+  62  |         fileName: "photo.jpg",
+  63  |         fileSizeBytes: 2_000_000,
+  64  |         mimeType: "image/jpeg",
+  65  |         artistId: "a",
+  66  |         resourceId: "r",
+  67  |       },
+  68  |     });
+  69  | 
+  70  |     expect(response.status()).toBe(200);
+  71  |   });
+  72  | 
+  73  |   test("returns 200 for exact 10 MB PNG image", async ({ page }) => {
+  74  |     const response = await page.request().post("/api/v1/storage/upload-intent", {
+  75  |       data: {
+  76  |         fileType: "image",
+  77  |         fileName: "exact.png",
+  78  |         fileSizeBytes: 10 * 1024 * 1024, // exactly at cap
+  79  |         mimeType: "image/png",
+  80  |         artistId: "a",
+  81  |         resourceId: "r",
+  82  |       },
+  83  |     });
+  84  | 
+  85  |     // 10 MB <= 10 MB cap, so should pass validation
+  86  |     expect(response.status()).toBe(200);
+  87  |   });
+  88  | 
+  89  |   // ---------------------------------------------------------------------------
+  90  |   // Validation rejections
+  91  |   // ---------------------------------------------------------------------------
+  92  | 
+  93  |   test("rejects audio exceeding 50 MB with 422", async ({ page }) => {
+  94  |     const response = await page.request().post("/api/v1/storage/upload-intent", {
+  95  |       data: {
+  96  |         fileType: "audio",
+  97  |         fileName: "huge.mp3",
+  98  |         fileSizeBytes: 55 * 1024 * 1024,
+  99  |         mimeType: "audio/mpeg",
+  100 |         artistId: "a",
+  101 |         resourceId: "r",
+  102 |       },
+  103 |     });
+  104 | 
+  105 |     expect(response.status()).toBe(422);
+  106 |     const body = await response.json();
+  107 |     expect(body.success).toBe(false);
+  108 |     expect(body.error.code).toBe("FILE_TOO_LARGE");
+  109 |   });
+  110 | 
+  111 |   test("rejects WebP image exceeding 10 MB", async ({ page }) => {
+  112 |     const response = await page.request().post("/api/v1/storage/upload-intent", {
+  113 |       data: {
+  114 |         fileType: "image",
+  115 |         fileName: "big.webp",
+  116 |         fileSizeBytes: 12 * 1024 * 1024,
+  117 |         mimeType: "image/webp",
+  118 |         artistId: "a",
+  119 |         resourceId: "r",
+  120 |       },
+  121 |     });
+  122 | 
+  123 |     expect(response.status()).toBe(422);
+  124 |     expect((await response.json()).error.code).toBe("FILE_TOO_LARGE");
+  125 |   });
+  126 | 
+  127 |   test("rejects unsupported audio MIME type", async ({ page }) => {
+  128 |     const response = await page.request().post("/api/v1/storage/upload-intent", {
+  129 |       data: {
+  130 |         fileType: "audio",
+  131 |         fileName: "bad.flac",
+  132 |         fileSizeBytes: 5_000_000,
+  133 |         mimeType: "audio/flac",
+  134 |         artistId: "a",
+  135 |         resourceId: "r",
+  136 |       },
+  137 |     });
+  138 | 
+  139 |     expect(response.status()).toBe(422);
+  140 |     expect((await response.json()).error.code).toBe("INVALID_AUDIO_MIME_TYPE");
+  141 |   });
+  142 | 
+  143 |   test("rejects invalid fileType", async ({ page }) => {
+> 144 |     const response = await page.request().post("/api/v1/storage/upload-intent", {
+      |                                 ^ TypeError: page.request is not a function
+  145 |       data: {
+  146 |         fileType: "video",
+  147 |         fileName: "bad.mp4",
+  148 |         fileSizeBytes: 1_000_000,
+  149 |         mimeType: "video/mp4",
+  150 |         artistId: "a",
+  151 |         resourceId: "r",
+  152 |       },
+  153 |     });
+  154 | 
+  155 |     expect(response.status()).toBe(422);
+  156 |     expect((await response.json()).success).toBe(false);
+  157 |   });
+  158 | 
+  159 |   test("rejects missing required fields", async ({ page }) => {
+  160 |     const response = await page.request().post("/api/v1/storage/upload-intent", {
+  161 |       data: {
+  162 |         fileType: "audio",
+  163 |         fileSizeBytes: 1_000_000,
+  164 |         mimeType: "audio/mpeg",
+  165 |         artistId: "a",
+  166 |         resourceId: "r",
+  167 |         // fileName omitted
+  168 |       },
+  169 |     });
+  170 | 
+  171 |     expect(response.status()).toBe(422);
+  172 |     const body = await response.json();
+  173 |     expect(body.success).toBe(false);
+  174 |   });
+  175 | });
+  176 | 
+```

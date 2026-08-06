@@ -15,6 +15,7 @@ import type {
 } from "./storage.service";
 import {
   S3StorageProvider,
+  StorageError,
   createStorageProvider,
 } from "./storage.service";
 
@@ -274,6 +275,24 @@ describe("getObjectMetadata", () => {
     expect(result.contentType).toBe("");
     expect(result.eTag).toBe("");
   });
+
+  it("throws a descriptive StorageError on AWS API failure", async () => {
+    const config = makeConfig();
+    const key = "audio/missing-track.mp3";
+    const awsError = { message: "AccessDenied", Code: "AccessDenied" };
+    mockS3Client.send.mockRejectedValue(awsError);
+
+    try {
+      await provider.getObjectMetadata(config, key);
+      expect.fail("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(StorageError);
+      const storageErr = err as StorageError;
+      expect(storageErr.awsCode).toBe("AccessDenied");
+      expect(storageErr.message).toContain("Failed to retrieve metadata");
+      expect(storageErr.message).toContain(key);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -303,6 +322,24 @@ describe("deleteObject", () => {
       expect.objectContaining({ Bucket: config.bucket, Key: key }),
     );
     expect(mockS3Client.send).toHaveBeenCalled();
+  });
+
+  it("throws a descriptive StorageError on AWS API failure", async () => {
+    const config = makeConfig();
+    const key = "audio/missing-track.mp3";
+    const awsError = { message: "NoSuchKey", Code: "NoSuchKey" };
+    mockS3Client.send.mockRejectedValue(awsError);
+
+    try {
+      await provider.deleteObject(config, key);
+      expect.fail("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(StorageError);
+      const storageErr = err as StorageError;
+      expect(storageErr.awsCode).toBe("NoSuchKey");
+      expect(storageErr.message).toContain("Failed to delete object");
+      expect(storageErr.message).toContain(key);
+    }
   });
 });
 
@@ -342,6 +379,15 @@ describe("PresignedUrlResult", () => {
 // ---------------------------------------------------------------------------
 
 describe("createStorageProvider", () => {
+  beforeEach(() => {
+    // Clear any env stubs from prior tests so this suite starts clean.
+    vi.unstubAllEnvs();
+  });
+
+  afterAll(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("returns an instance implementing StorageProviderInterface", () => {
     const config = makeConfig();
     const provider = createStorageProvider(config);
@@ -355,7 +401,7 @@ describe("createStorageProvider", () => {
     expect(typeof p.getObjectMetadata).toBe("function");
   });
 
-  it("works with STORAGE_PROVIDER set to 's3'", () => {
+  it("returns S3StorageProvider when STORAGE_PROVIDER is 's3'", () => {
     vi.stubEnv("STORAGE_PROVIDER", "s3");
     try {
       const config = makeConfig();
@@ -366,7 +412,7 @@ describe("createStorageProvider", () => {
     }
   });
 
-  it("works with STORAGE_PROVIDER set to 'r2'", () => {
+  it("returns S3StorageProvider when STORAGE_PROVIDER is 'r2'", () => {
     vi.stubEnv("STORAGE_PROVIDER", "r2");
     try {
       const config = makeConfig();
@@ -377,9 +423,32 @@ describe("createStorageProvider", () => {
     }
   });
 
-  it("defaults gracefully when STORAGE_PROVIDER is unset", () => {
+  it("defaults to S3StorageProvider when STORAGE_PROVIDER is unset", () => {
+    // No env stub — process.env.STORAGE_PROVIDER should be absent.
     const config = makeConfig();
     const provider = createStorageProvider(config);
     expect(provider).toBeInstanceOf(S3StorageProvider);
+  });
+
+  it("defaults to S3StorageProvider when STORAGE_PROVIDER is an invalid value", () => {
+    vi.stubEnv("STORAGE_PROVIDER", "azure");
+    try {
+      const config = makeConfig();
+      const provider = createStorageProvider(config);
+      expect(provider).toBeInstanceOf(S3StorageProvider);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("passes through StorageConfig unchanged — provider is stateless", () => {
+    vi.stubEnv("STORAGE_PROVIDER", "r2");
+    try {
+      const config = makeConfig({ endpoint: "https://custom.r2.cloudflarestorage.com" });
+      const provider = createStorageProvider(config);
+      expect(provider).toBeInstanceOf(S3StorageProvider);
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });

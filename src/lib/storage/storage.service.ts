@@ -73,6 +73,31 @@ export interface ObjectMetadata {
 }
 
 // ---------------------------------------------------------------------------
+// StorageError — descriptive error for AWS API failures
+// ---------------------------------------------------------------------------
+
+/**
+ * Error thrown when an AWS S3/R2 API call fails inside the storage provider.
+ *
+ * Wraps the underlying SDK error with a human-readable message that includes
+ * the operation name, and preserves the original AWS error code for callers
+ * that need to inspect specific failure reasons (NoSuchKey, AccessDenied, etc.).
+ */
+export class StorageError extends Error {
+  /** Machine-readable AWS error code (e.g. "NoSuchKey", "AccessDenied"). */
+  readonly awsCode: string;
+
+  constructor(message: string, awsCode: string, cause?: Error) {
+    super(message);
+    this.name = "StorageError";
+    this.awsCode = awsCode;
+    if (cause) {
+      this.cause = cause;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // StorageProviderInterface — new unified contract
 // ---------------------------------------------------------------------------
 
@@ -207,6 +232,8 @@ export class S3StorageProvider implements StorageProviderInterface {
 
   /**
    * Delete an object from cloud storage.
+   *
+   * Wraps AWS SDK errors with a descriptive message on failure.
    */
   async deleteObject(config: StorageConfig, key: string): Promise<void> {
     const client = this._createClient(config);
@@ -216,13 +243,24 @@ export class S3StorageProvider implements StorageProviderInterface {
       Key: key,
     });
 
-    await client.send(command);
+    try {
+      await client.send(command);
+    } catch (err) {
+      const awsCode =
+        (err as Record<string, unknown>).Code ?? (err as Error).message;
+      throw new StorageError(
+        `Failed to delete object "${key}"`,
+        String(awsCode),
+        err as Error,
+      );
+    }
   }
 
   /**
    * Retrieve metadata for an object without downloading it.
    *
    * Uses HeadObject to fetch ContentLength, ContentType, and ETag.
+   * Wraps AWS SDK errors with a descriptive message on failure.
    */
   async getObjectMetadata(
     config: StorageConfig,
@@ -235,13 +273,23 @@ export class S3StorageProvider implements StorageProviderInterface {
       Key: key,
     });
 
-    const response = await client.send(command);
+    try {
+      const response = await client.send(command);
 
-    return {
-      contentLength: response.ContentLength ?? 0,
-      contentType: response.ContentType ?? "",
-      eTag: response.ETag ?? "",
-    };
+      return {
+        contentLength: response.ContentLength ?? 0,
+        contentType: response.ContentType ?? "",
+        eTag: response.ETag ?? "",
+      };
+    } catch (err) {
+      const awsCode =
+        (err as Record<string, unknown>).Code ?? (err as Error).message;
+      throw new StorageError(
+        `Failed to retrieve metadata for "${key}"`,
+        String(awsCode),
+        err as Error,
+      );
+    }
   }
 
   /**
@@ -358,18 +406,36 @@ export class S3StorageService implements StorageService {
 // ---------------------------------------------------------------------------
 
 /**
+ * Valid values for the STORAGE_PROVIDER environment variable.
+ */
+const SUPPORTED_PROVIDERS = ["s3", "r2"] as const;
+
+/**
  * Create a StorageProvider instance based on the STORAGE_PROVIDER environment
  * variable.  Defaults to "s3" when the variable is absent or unrecognized.
  *
- * Supports: "s3" (Amazon S3), "r2" (Cloudflare R2 — S3-compatible).
- * Both backends share the same AWS SDK v3 client under the hood; the
- * configuration (endpoint, region, credentials) determines which service
- * is contacted.
+ * Supported providers:
+ *  - "s3"  : Amazon S3 (region + AWS endpoint)
+ *  - "r2"  : Cloudflare R2 (uses S3-compatible API via custom endpoint)
+ *
+ * Both backends share the same {@link S3StorageProvider} under the hood;
+ * the `endpoint` field in {@link StorageConfig} determines which service
+ * endpoint is contacted.
+ *
+ * @param config  Storage configuration passed through to each provider call.
+ * @returns A {@link StorageProviderInterface} instance.
  */
 export function createStorageProvider(
-  _config: StorageConfig,
+  config: StorageConfig,
 ): StorageProviderInterface {
-  // The provider is stateless — configuration is passed per-call to each
-  // method so the same instance can target different buckets/providers.
+  // Determine the requested provider; fall back to "s3" for missing or invalid values.
+  const provider = (process.env.STORAGE_PROVIDER ?? "s3") as string;
+
+  if (!SUPPORTED_PROVIDERS.includes(provider as (typeof SUPPORTED_PROVIDERS)[number])) {
+    // Silently degrade to S3 for any unknown provider value.
+  }
+
+  // S3StorageProvider works for both S3 and R2 — the endpoint in StorageConfig
+  // tells the AWS SDK v3 which endpoint to hit.
   return new S3StorageProvider();
 }

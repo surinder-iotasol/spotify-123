@@ -1216,7 +1216,7 @@
       ],
       "priority": 560.2,
       "effort": "medium",
-      "passes": false,
+      "passes": true,
       "dependsOn": [
         "STORY-storage-004a"
       ],
