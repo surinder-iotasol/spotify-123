@@ -162,13 +162,14 @@ describe("Env type", () => {
       "AWS_SECRET_ACCESS_KEY",
       "S3_BUCKET_NAME",
       "S3_ENDPOINT",
+      "STORAGE_PROVIDER",
     ];
 
     for (const key of keys) {
       expect(typeof env[key]).toBe("string");
     }
 
-    // Exactly 7 keys
-    expect(Object.keys(env).length).toBe(7);
+    // Exactly 8 keys
+    expect(Object.keys(env).length).toBe(8);
   });
 });
